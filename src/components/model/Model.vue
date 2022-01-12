@@ -106,6 +106,7 @@
         ></v-img>
       </v-carousel-item>
     </v-carousel>
+    <model-object></model-object>
       <v-btn
         class="white--text"
         color="teal"
@@ -119,7 +120,11 @@
 </template>
 
 <script>
+import ModelObject from './ModelObject.vue'
 export default {
+  components: {
+    ModelObject
+  },
 data: () => ({
       overlay: false,
       zIndex: 2,
