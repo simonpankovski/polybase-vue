@@ -7,14 +7,15 @@
     scroll-target="#scrolling-techniques-7"
   >
     <div class="d-flex align-center">
-      <v-img
+      <router-link to="/"><v-img
         alt="Vuetify Logo"
         class="shrink mr-2"
         contain
         src="../../assets/logo.svg"
         transition="scale-transition"
         width="40"
-      />
+      /></router-link>
+      
       <span class="white--text">Polybase</span>
     </div>
     <v-spacer></v-spacer>
@@ -23,7 +24,7 @@
       <router-link to="/register">Register</router-link>
     </template>
     <template v-else>
-      <router-link to="/browse" class="pr-2"
+      <router-link to="/browse/models/all" class="pr-2"
         ><v-icon dark> mdi-toy-brick-search </v-icon></router-link
       >
       <router-link to="/sell" class="pr-2"

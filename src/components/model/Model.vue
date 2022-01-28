@@ -39,7 +39,7 @@
         class="mx-0"
       >
         <v-rating
-          :value="4.5"
+          :value="this.rating"
           color="amber"
           dense
           half-increments
@@ -48,7 +48,7 @@
         ></v-rating>
 
         <div class="grey--text ms-4">
-          4.5 (413)
+          {{this.rating}} ({{this.users}})
         </div>
       </v-row>
 
@@ -106,7 +106,7 @@
         ></v-img>
       </v-carousel-item>
     </v-carousel>
-    <model-object></model-object>
+    <texture></texture>
       <v-btn
         class="white--text"
         color="teal"
@@ -120,12 +120,15 @@
 </template>
 
 <script>
-import ModelObject from './ModelObject.vue'
+import { mapGetters } from "vuex";
+import Texture from './Texture.vue'
 export default {
   components: {
-    ModelObject
+    Texture
   },
 data: () => ({
+    rating:0,
+    users:0,
       overlay: false,
       zIndex: 2,
       loading: false,
@@ -135,10 +138,25 @@ data: () => ({
         cycle: true,
         
     }),
-    props: ['modelData'],
+    props: ['modelData', 'isModel'],
+    methods: {
+...mapGetters(["getToken"]),
+    },
     created: function () {
-    // `this` points to the vm instance
-    console.log(this.modelData)
+      console.log(this.isModel)
+    
+    /*if(typeof this.modelData.rating[0][1] == "string") 
+    {
+      this.rating = parseFloat(this.modelData.rating[0][1])
+    }
+    else if(typeof this.modelData.rating[0][1] == "object")
+    {
+      this.rating = 0;
+    }
+    this.users = this.modelData.rating[0][2]*/
+    this.rating = this.modelData.rating
+    this.users = this.modelData.purchaseCount
+    //console.log(typeof this.modelData.rating[0][1])
   }
 }
 </script>

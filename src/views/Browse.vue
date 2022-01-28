@@ -19,9 +19,16 @@
 
               <v-list-item v-for="child in item.items" :key="child.title">
                 <v-list-item-content>
-                  <router-link class="no-style" :to="'/browse/' + child">{{
-                    child
-                  }}</router-link>
+                  <router-link
+                    class="no-style"
+                    :to="
+                      '/browse/' +
+                      item.title.toLowerCase() +
+                      '/' +
+                      child.toLowerCase()
+                    "
+                    >{{ child }}</router-link
+                  >
                 </v-list-item-content>
               </v-list-item>
             </v-list-group>
@@ -34,6 +41,7 @@
             v-for="model in models"
             :key="model.id"
             :model-data="model"
+            :is-model="isModel"
           ></model>
         </div>
         <div class="text-center">
@@ -55,12 +63,14 @@ import { mapGetters } from "vuex";
 export default {
   components: { Model },
   data: () => ({
+    isModel: true,
     page: 1,
     pages: 0,
     items: [
       {
         action: "mdi-toy-brick",
         items: [
+          "All",
           "Space",
           "Transport",
           "Architecture",
@@ -74,7 +84,7 @@ export default {
       },
       {
         action: "mdi-texture",
-        items: [{ title: "Free" }],
+        items: ["All", "Free", "Dirt", "Metal", "Wood", "Concrete", "Marble"],
         title: "Textures",
       },
     ],
@@ -85,30 +95,59 @@ export default {
     pagination() {
       this.getResults();
     },
+    capitalizeFirstLetter(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    },
     getResults() {
       let token = this.getToken();
       let pathName = window.location.pathname.split("/");
       let category = "";
+      let type = "";
       if (pathName.length > 2) {
-        category = pathName[pathName.length - 1];
+        category = this.capitalizeFirstLetter(pathName[pathName.length - 1]);
+        type = this.capitalizeFirstLetter(pathName[pathName.length - 2]);
       }
-      fetch(
-        "http://localhost:8000/api/model/?category=" +
-          category +
-          "&page=" +
-          this.page,
-        {
-          method: "GET",
-          headers: {
-            authorization: "Bearer " + token,
-          },
-        }
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          this.models = data.slice(0, data.length - 1);
-          this.pages = data[data.length - 1];
-        });
+      if (category == "All" || category == "all") category = ""
+      console.log(category)
+      if (type == "Models") {
+        fetch(
+          "http://localhost:8000/api/model/?category=" +
+            category +
+            "&page=" +
+            this.page,
+          {
+            method: "GET",
+            headers: {
+              authorization: "Bearer " + token,
+            },
+          }
+        )
+          .then((res) => res.json())
+          .then((data) => {
+            this.models = data.slice(0, data.length - 1);
+            this.pages = data[data.length - 1];
+          });
+      }
+      else if (type == "Textures") {
+          
+          fetch(
+          "http://localhost:8000/api/texture/?category=" +
+            category +
+            "&page=" +
+            this.page,
+          {
+            method: "GET",
+            headers: {
+              authorization: "Bearer " + token,
+            },
+          }
+        )
+          .then((res) => res.json())
+          .then((data) => {
+            this.models = data.slice(0, data.length - 1);
+            this.pages = data[data.length - 1];
+          });
+      }
     },
   },
   created: function () {
@@ -117,7 +156,6 @@ export default {
   watch: {
     $route(to, from) {
       console.log(to.params.category, from);
-      console.log(document.querySelectorAll(".no-style"))
       this.getResults();
     },
   },
@@ -133,6 +171,6 @@ export default {
   color: rgba(0, 0, 0, 0.87) !important;
 }
 .router-link-active {
-  color: orange!important;
+  color: orange !important;
 }
 </style>
