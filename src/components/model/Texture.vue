@@ -1,24 +1,63 @@
 <template>
-  <div id="container"></div>
+  <div>
+    <div id="container">
+      <v-subheader class="pl-0">
+        <h2>Metalness</h2>
+      </v-subheader>
+      <v-slider
+        v-model="metalness"
+        thumb-label="always"
+        :thumb-color="'orange'"
+        @change="metalnessFunc"
+      ></v-slider>
+      <v-subheader class="pl-0">
+        <h2>Roughness</h2>
+      </v-subheader>
+      <v-slider
+        v-model="roughness"
+        thumb-label="always"
+        :thumb-color="'orange'"
+        @change="metalnessFunc"
+      ></v-slider>
+    </div>
+  </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
 import * as Three from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
 export default {
   data() {
     return {
+      logo: require("@/assets/lilienstein_4k.hdr"),
       camera: null,
       scene: null,
       renderer: null,
       mesh: null,
       controls: null,
       file: "",
+      roughness: 10,
+      color: "",
+      metalness: 45,
+      normal: "",
+      disp: "",
+      ao: "",
+      metal: "",
+      rough: "",
     };
   },
-  props: ["modelData"],
+  props: ["modelId", "category"],
   methods: {
+    metalnessFunc: function () {
+      if (this.mesh != null) {
+        this.mesh.material.metalness = this.metalness * 0.01;
+        this.mesh.material.roughness = this.roughness * 0.01;
+      }
+
+      this.renderer.render(this.scene, this.camera);
+    },
     ...mapGetters(["getToken"]),
     blobToDataURL: function (blob, callback) {
       var a = new FileReader();
@@ -29,7 +68,7 @@ export default {
     },
     clicked: function () {
       let token = "Bearer " + this.getToken();
-      fetch("http://localhost:8000/api/texture/5", {
+      fetch("http://localhost:8000/api/texture/" + this.modelId, {
         method: "GET",
         mode: "cors",
         headers: {
@@ -41,17 +80,39 @@ export default {
           return res.json();
         })
         .then((blob) => {
-          console.log(blob.message)
+          console.log(this.category);
           if (blob.code == 200) {
-            let message = blob.message
-            this.init(message[1].file, message[5].file, message[4].file, message[3].file);
-            this.animate();
+            let message = blob.message;
+            message.forEach((element) => {
+              let filename =
+                element.headers["content-disposition"][0].split("=")[1];
+              if (filename.includes("COL")) {
+                this.color = element.file;
+              } else if (filename.includes("AO")) {
+                this.ao = element.file;
+              } else if (filename.includes("DISP")) {
+                this.disp = element.file;
+              } else if (filename.includes("NRM")) {
+                this.normal = element.file;
+              } else if (
+                filename.includes("ROUGH") ||
+                filename.includes("REFL")
+              ) {
+                this.rough = element.file;
+              } else if (
+                filename.includes("METAL") ||
+                filename.includes("GLOSS")
+              ) {
+                this.metal = element.file;
+              }
+            });
+            this.init();
           } else {
-            console.log(blob.message);
+            console.log("blob.message");
           }
         });
     },
-    init: function (color, normal, roughness, height) {
+    init: function () {
       let container = document.getElementById("container");
 
       //const loader = new FBXLoader();
@@ -62,43 +123,59 @@ export default {
         20
       );
       this.camera.position.z = 12;
-      const light = new Three.HemisphereLight(0xffffff, 0x080820, 6);
+      const light = new Three.DirectionalLight(0xffffff, 1);
 
       // move the light right, up, and towards us
       light.position.set(10, 10, 15);
       this.scene = new Three.Scene();
       this.scene.background = new Three.Color("#575454");
 
-      const geometry = new Three.SphereGeometry(4, 64, 64);
+      const geometry = new Three.SphereGeometry(4, 1024, 1024);
       const textureLoader = new Three.TextureLoader();
-      let colorMap = textureLoader.load(color);
-      let normalMap = textureLoader.load(normal);
-      let displacementMap = textureLoader.load(height);
-      let roughnessMap = textureLoader.load(roughness);
+      let colorMap = textureLoader.load(this.color);
+      let normalMap = textureLoader.load(this.normal);
+      let displacementMap = textureLoader.load(this.disp);
+      let roughnessMap = textureLoader.load(this.roughness);
+      let aoMap = textureLoader.load(this.ao);
+      let metalMap = textureLoader.load(this.metal);
       let self = this;
-      const material = new Three.MeshStandardMaterial({
-        map: colorMap,
-        normalMap: normalMap,
-        roughnessMap: roughnessMap,
-        roughness: 0.1,
-        displacementMap: displacementMap,
-        //aoMap: ao
-      });
-      // create a Mesh containing the geometry and material
-      const cube = new Three.Mesh(geometry, material);
-      cube.rotation.set(0.2, -0.7, 2.8);
-      //cube.geometry.attributes.uv2 = cube.geometry.attributes.uv
-      // add the mesh to the scene
-      self.mesh = cube;
-      self.scene.add(cube, light);
-
       self.renderer = new Three.WebGLRenderer({ antialias: true });
+      self.renderer.outputEncoding = Three.sRGBEncoding;
+      self.renderer.toneMapping = Three.ACESFilmicToneMapping;
+      self.renderer.toneMappingExposure = 1.25;
       self.renderer.setSize(container.clientWidth, container.clientHeight);
       self.renderer.setPixelRatio(window.devicePixelRatio);
       self.renderer.physicallyCorrectLights = true;
-      container.appendChild(self.renderer.domElement);
-      self.renderer.render(self.scene, self.camera);
-      self.controls = new OrbitControls(self.camera, self.renderer.domElement);
+      let roughnessValue = self.roughness * 0.01;
+      let metalnessValue = self.metalness * 0.01;
+      let envmapLoader = new Three.PMREMGenerator(self.renderer);
+      new RGBELoader().load(this.logo, function (hdrMap) {
+        let envMap = envmapLoader.fromCubemap(hdrMap);
+        const material = new Three.MeshStandardMaterial({
+          map: colorMap,
+          normalMap: normalMap,
+          roughnessMap: roughnessMap,
+          roughness: roughnessValue,
+          aoMap: aoMap,
+          displacementMap: displacementMap,
+          metalnessMap: metalMap,
+          metalness: metalnessValue,
+          envMap: envMap.texture,
+        });
+        const cube = new Three.Mesh(geometry, material);
+        cube.geometry.attributes.uv2 = cube.geometry.attributes.uv;
+        cube.rotation.set(0.2, -0.7, 2.8);
+
+        self.mesh = cube;
+        self.scene.add(cube, light);
+        container.appendChild(self.renderer.domElement);
+        self.renderer.render(self.scene, self.camera);
+        self.controls = new OrbitControls(
+          self.camera,
+          self.renderer.domElement
+        );
+        self.animate();
+      });
     },
     animate() {
       requestAnimationFrame(this.animate);

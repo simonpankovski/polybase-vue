@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container class="mt-10" id="container">
     <h1>LOGIN</h1>
     <form @submit.prevent="login">
       <v-text-field
@@ -18,7 +18,10 @@
         name="password"
       ></v-text-field>
       <p v-if="invalidLogin" class="red--text pt-2">Invalid Credentials</p>
-      <v-btn class="mt-10" type="submit"> submit </v-btn>
+      <div class="d-flex justify-space-between align-end">
+        <v-btn class="mt-10 orange darken-2 accent-2 white--text" type="submit"> submit </v-btn>
+        <a href="#" id="password-link">Forgot password?</a>
+      </div>
     </form>
   </v-container>
 </template>
@@ -90,3 +93,11 @@ export default {
   },
 };
 </script>
+<style scoped>
+#container {
+  width: 30%;
+}
+#password-link {
+  text-decoration: none;
+}
+</style>

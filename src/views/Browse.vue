@@ -126,6 +126,7 @@ export default {
           .then((data) => {
             this.models = data.slice(0, data.length - 1);
             this.pages = data[data.length - 1];
+            this.isModel = true;
           });
       }
       else if (type == "Textures") {
@@ -146,6 +147,7 @@ export default {
           .then((data) => {
             this.models = data.slice(0, data.length - 1);
             this.pages = data[data.length - 1];
+            this.isModel = false;
           });
       }
     },

@@ -44,8 +44,8 @@ export default {
           return res.json();
         })
         .then((blob) => {
-          console.log(blob.file);
           this.init(blob.file);
+          this.animate();
         });
     },
     init: function (blob) {
@@ -93,7 +93,7 @@ export default {
   },
   mounted() {
     this.clicked();
-    this.animate();
+    
   },
 };
 </script>

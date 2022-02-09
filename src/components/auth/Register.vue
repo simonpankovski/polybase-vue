@@ -1,6 +1,6 @@
 <template>
-  <v-container>
-    <h1>LOGIN</h1>
+  <v-container class="mt-10" id="container">
+    <h1>Register</h1>
     <form @submit.prevent="login">
       <v-text-field
         label="Email"
@@ -25,7 +25,7 @@
         ref="password"
         v-model="confirmPassword"
       ></v-text-field>
-      <v-btn class="mt-10" type="submit"> submit </v-btn>
+      <v-btn class="mt-10 orange darken-2 accent-2 white--text" type="submit"> submit </v-btn>
     </form>
   </v-container>
 </template>
@@ -104,5 +104,8 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss" scoped>
+#container {
+  width: 30%;
+}
 </style>

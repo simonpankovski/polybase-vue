@@ -156,12 +156,16 @@ export default {
           body: data,
         })
           .then((res) => {
-            //this.$router.push("/browse");
             return res.json();
           })
           .then((res) => {
             this.snackbar = true;
             this.text = res.message;
+            if (res.code == 200) {
+              setTimeout(() => {
+                this.$router.push("/browse");
+              }, 2000);
+            }
           });
       }
     },
