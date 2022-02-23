@@ -5,7 +5,8 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    token: null
+    token: null,
+    cart: 0
   },
   mutations: {
     setToken(state, token) {
@@ -15,11 +16,23 @@ export default new Vuex.Store({
     removeToken(state) {
       state.token = null;
       document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    },
+    incrementCart(state) {
+      state.cart++;
+    },
+    decrementCart(state) {
+      state.cart++;
+    },
+    setCart(state, count) {
+      state.cart = count;
     }
   },
   getters: {
     getToken: () => {
       return getCookie("token");
+    },
+    getCart: (state) => {
+      return state.cart;
     }
   },
   actions: {

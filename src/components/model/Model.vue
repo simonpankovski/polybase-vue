@@ -60,58 +60,99 @@
       </v-chip-group>
     </v-card-text>
 
-    <v-card-actions>
+    <v-card-actions class="justify-space-between">
       <v-btn class="white--text" @click="overlay = !overlay">
         <v-icon large color="grey darken-4"> mdi-cart </v-icon>
       </v-btn>
-
-      <v-overlay :z-index="zIndex" :value="overlay">
-        <div class="d-flex justify-space-between">
-          <v-btn
-            class="white--text"
-            color="transparent"
-            @click="overlay = false"
-          >
-            <v-icon large color="white"> mdi-close </v-icon>
-          </v-btn>
-          <v-btn
-            class="white--text"
-            color="deep-orange accent-2"
-            @click="overlay = false"
-          >
-            <v-icon large color="white"> mdi-cart </v-icon>
-          </v-btn>
-        </div>
-        <v-row class="mt-16">
-          <v-col>
-            <v-carousel
-              :continuous="true"
-              :cycle="this.cycle"
-              :show-arrows="true"
-              hide-delimiter-background
-              delimiter-icon="mdi-minus"
-              height="300"
+      <v-btn
+        color="orange"
+        class="white--text"
+        v-if="displayDownloadButton"
+        @click="downloadModel"
+      >
+        <v-icon large color="white"> mdi-cloud-download-outline</v-icon>
+      </v-btn>
+      <v-overlay :z-index="zIndex" :value="overlay" style="width: 100%!important;">
+        <v-card elevation="2" style="height: 100vh, width: 100vw;">
+          <v-container>
+            <div
+              class="d-flex justify-space-between"
+              style="padding-top: 10px"
             >
-              <v-carousel-item
-                v-for="(item, i) in this.modelData.thumbnailLinks"
-                :key="i"
+              <v-snackbar class="mt-16" top v-model="snackbar">
+                {{ text }}
+
+                <template v-slot:action="{ attrs }">
+                  <v-btn
+                    color="pink"
+                    text
+                    v-bind="attrs"
+                    @click="snackbar = false"
+                  >
+                    Close
+                  </v-btn>
+                </template>
+              </v-snackbar>
+              <v-btn
+                class="white--text"
+                color="transparent"
+                @click="overlay = false"
               >
-                <v-img :src="item" height="300" width="500"></v-img>
-              </v-carousel-item>
-            </v-carousel>
-          </v-col>
-          <v-col>
-            <model-object
-              :model-id="this.modelData.id"
-              v-if="this.isModel"
-            ></model-object>
-            <texture
-              :model-id="this.modelData.id"
-              :category="this.modelData.category"
-              v-else
-            ></texture>
-          </v-col>
-        </v-row>
+                <v-icon large color="white"> mdi-close </v-icon>
+              </v-btn>
+              <v-btn
+                color="orange"
+                class="white--text"
+                @click="downloadModel"
+                v-if="displayDownloadButton"
+              >
+                <v-icon large color="white"> mdi-cloud-download-outline</v-icon>
+              </v-btn>
+              <v-btn
+                v-else
+                class="white--text"
+                color="deep-orange accent-2"
+                @click="addToCart"
+              >
+                <v-icon large color="white"> mdi-cart </v-icon>
+              </v-btn>
+            </div>
+            <v-row class="mt-16">
+              <v-col>
+                <v-carousel
+                  :continuous="true"
+                  :cycle="this.cycle"
+                  :show-arrows="true"
+                  hide-delimiter-background
+                  delimiter-icon="mdi-minus"
+                  height="300"
+                >
+                  <v-carousel-item
+                    v-for="(item, i) in this.modelData.thumbnailLinks"
+                    :key="i"
+                  >
+                    <v-img :src="item" height="300" width="500"></v-img>
+                  </v-carousel-item>
+                </v-carousel>
+                <div class="mt-10 ml-5">
+                  <h1>{{ this.modelData.name }}</h1>
+                  <h4 class="mt-5">{{ this.modelData.price }} $</h4>
+                </div>
+              </v-col>
+              <v-col>
+                <model-object
+                  :model-id="this.modelData.id"
+                  v-if="this.isModel"
+                ></model-object>
+                <texture
+                  :model-id="this.modelData.id"
+                  :category="this.modelData.category"
+                  v-else
+                ></texture>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card>
       </v-overlay>
     </v-card-actions>
   </v-card>
@@ -119,6 +160,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+import { mapMutations } from "vuex";
 import Texture from "./Texture.vue";
 import ModelObject from "./ModelObject.vue";
 export default {
@@ -127,6 +169,8 @@ export default {
     ModelObject,
   },
   data: () => ({
+    snackbar: false,
+    text: `Hello, I'm a snackbar`,
     rating: 0,
     users: 0,
     overlay: false,
@@ -135,17 +179,77 @@ export default {
     selection: 1,
     colors: [],
     cycle: true,
+    user: "",
   }),
   props: ["modelData", "isModel"],
   methods: {
-    ...mapGetters(["getToken"]),
+    ...mapGetters(["getToken", "getCart"]),
+    ...mapMutations(["incrementCart", "decrementCart"]),
+    parseJwt: function (token) {
+      var base64Payload = token.split(".")[1];
+      var payload = Buffer.from(base64Payload, "base64");
+      return JSON.parse(payload.toString());
+    },
+    downloadModel: function () {
+      let jwt = "Bearer " + this.getToken();
+      fetch("http://localhost:8000/api/model/" + this.modelData.id, {
+        method: "GET",
+        mode: "cors",
+        headers: {
+          Authorization: jwt,
+          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => res.blob())
+        .then((blob) => {
+          var file = window.URL.createObjectURL(blob);
+          window.location.assign(file);
+        });
+    },
+    addToCart: function () {
+      let token = "Bearer " + this.getToken();
+      let model = this.isModel ? "model" : "texture";
+      fetch(
+        "http://localhost:8000/api/cart/" +
+          this.modelData.id +
+          "?type=" +
+          model,
+        {
+          method: "POST",
+          mode: "cors",
+          headers: {
+            Authorization: token,
+            "Access-Control-Allow-Origin": "*",
+          },
+        }
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          this.text = data.message;
+          this.snackbar = true;
+          if (data.code == 200) {
+            this.$store.commit("incrementCart");
+          }
+        });
+    },
+  },
+  computed: {
+    displayDownloadButton: function () {
+      // `this` points to the vm instance
+      return this.modelData.purchases.includes(this.user);
+    },
   },
   created: function () {
+    this.user = this.parseJwt(this.getToken()).username;
     this.rating = this.modelData.rating;
     this.users = this.modelData.purchaseCount;
   },
 };
 </script>
 
-<style>
+<style scoped>
+.v-overlay__content {
+  widows: 100%!important;
+}
 </style>

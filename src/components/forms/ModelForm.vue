@@ -179,7 +179,16 @@ export default {
           .then((res) => {
             this.snackbar = true;
             this.text = res.message;
-            //this.$router.push("/browse");
+            if (res.code == 400) {
+              setTimeout(() => {
+                this.$router.push("/sell");
+              }, 2000);
+            }
+            if (res.code == 200) {
+              setTimeout(() => {
+                this.$router.push("/browse/models/all");
+              }, 2000);
+            }
           });
       }
     },

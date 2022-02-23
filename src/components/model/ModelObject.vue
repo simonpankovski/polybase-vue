@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div id="container">CON</div>
+    <div id="container"></div>
   </div>
 </template>
 
@@ -9,6 +9,7 @@ import { mapGetters } from "vuex";
 import * as Three from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
+import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
 export default {
   data() {
     return {
@@ -18,9 +19,20 @@ export default {
       mesh: null,
       controls: null,
       file: "",
+      roughness: 10,
+      color: "",
+      metalness: 45,
+      normal: "",
+      disp: "",
+      ao: "",
+      metal: "",
+      rough: "",
+      isGlass: false,
+      isMetal: false,
+      hdr: require("@/assets/studio_country_hall_1k.hdr"),
     };
   },
-  props: ["modelData"],
+  props: ["modelData", "modelId"],
   methods: {
     ...mapGetters(["getToken"]),
     blobToDataURL: function (blob, callback) {
@@ -32,34 +44,39 @@ export default {
     },
     clicked: function () {
       let token = "Bearer " + this.getToken();
-      fetch("http://localhost:8000/api/model/2", {
-        method: "GET",
-        mode: "cors",
-        headers: {
-          Authorization: token,
-          "Access-Control-Allow-Origin": "*",
-        },
-      })
+      fetch(
+        "http://localhost:8000/api/model/" + this.modelId + "?browse=true",
+        {
+          method: "GET",
+          mode: "cors",
+          headers: {
+            Authorization: token,
+            "Access-Control-Allow-Origin": "*",
+          },
+        }
+      )
         .then((res) => {
           return res.json();
         })
         .then((blob) => {
-          this.init(blob.file);
+          console.log(blob);
+          this.init(blob[0][0].file, blob[0].slice(1), token, blob[1]);
           this.animate();
         });
     },
-    init: function (blob) {
+    init: function (blob, textures) {
       let container = document.getElementById("container");
 
-      //const loader = new FBXLoader();
+      const loader = new FBXLoader();
       this.camera = new Three.PerspectiveCamera(
         70,
         container.clientWidth / container.clientHeight,
         0.01,
-        20
+        1000
       );
-      this.camera.position.z = 12;
-      const light = new Three.HemisphereLight(0xffffff, 0x080820, 6);
+      this.camera.position.z = 4;
+      this.camera.position.x = 100;
+      const light = new Three.DirectionalLight(0xffffff, 1);
 
       // move the light right, up, and towards us
       light.position.set(10, 10, 15);
@@ -67,20 +84,89 @@ export default {
       this.scene.background = new Three.Color("#575454");
       let self = this;
       // create a Mesh containing the geometry and material
-      const loader = new FBXLoader();
-      loader.setResourcePath( 'http://localhost:8000/api/models/textures/2' );
-      loader.load(
-        blob,
-        function (object) {
-          self.scene.add(object, light);
-          self.mesh = object;
-        },
-        
-      );
+      //loader.setResourcePath( 'http://localhost:8000/models/chair/textures/' );
+      let hdr = this.hdr;
+      const textureLoader = new Three.TextureLoader();
       this.renderer = new Three.WebGLRenderer({ antialias: true });
+      this.renderer.outputEncoding = Three.sRGBEncoding;
+      this.renderer.toneMapping = Three.ACESFilmicToneMapping;
+      this.renderer.toneMappingExposure = 1.25;
       this.renderer.setSize(container.clientWidth, container.clientHeight);
       this.renderer.setPixelRatio(window.devicePixelRatio);
       this.renderer.physicallyCorrectLights = true;
+      loader.load(blob, function (object) {
+        object.traverse(function (child) {
+          if (child instanceof Three.Mesh) {
+            let data = textures;
+            data.forEach((element) => {
+              let filename =
+                element.headers["content-disposition"][0].split("=")[1];
+              if (filename.includes("COL")) {
+                self.color = element.file;
+              } else if (filename.includes("AO")) {
+                self.ao = element.file;
+              } else if (filename.includes("DISP")) {
+                self.disp = element.file;
+              } else if (filename.includes("NRM")) {
+                self.normal = element.file;
+              } else if (
+                filename.includes("ROUGH") ||
+                filename.includes("GLOSS")
+              ) {
+                self.rough = element.file;
+              } else if (filename.includes("METAL")) {
+                self.metal = element.file;
+                self.isMetal = true;
+              } else if (filename.includes("TRANS")) {
+                self.transmission = element.file;
+                self.isGlass = true;
+              }
+            });
+            let envmapLoader = new Three.PMREMGenerator(self.renderer);
+            let colorMap = textureLoader.load(self.color);
+            let roughnessMap = textureLoader.load(self.rough);
+            let normalMap = textureLoader.load(self.normal);
+            let aoMap = textureLoader.load(self.ao);
+            let transmissionMap = textureLoader.load(self.transmission);
+            
+            new RGBELoader().load(hdr, function (hdrMap) {
+              let envMap = envmapLoader.fromCubemap(hdrMap);
+              self.scene.background = envMap.texture;
+              console.log(self.isMetal)
+              const material = new Three.MeshPhysicalMaterial({
+                map: colorMap,
+                envMap: envMap.texture,
+                normalMap: normalMap,
+                roughnessMap: roughnessMap,
+                roughness: 1,
+                metalness: 0,
+                aoMap,
+              });
+              console.log(material);
+              if (self.isGlass) {
+                //material.color = 0xffffff;
+                material.map = null;
+                material.roughness = 0;
+                material.metalness = 0;
+                material.transmission = 1;
+                material.opacity = 1;
+                material.transmissionMap = transmissionMap;
+                material.normalScale = new Three.Vector2(0.01, 0.01);
+              } else if (self.metal != "") {
+                material.metalness = 1;
+                material.roughness = 0;
+                material.transmission = 0;
+                material.normalScale = new Three.Vector2(1, 1);
+              }
+              child.geometry.attributes.uv2 = child.geometry.attributes.uv;
+              child.material = material;
+            });
+          }
+        });
+
+        self.scene.add(object, light);
+        self.mesh = object;
+      });
       container.appendChild(this.renderer.domElement);
       this.renderer.render(this.scene, this.camera);
       this.controls = new OrbitControls(this.camera, this.renderer.domElement);
@@ -93,7 +179,6 @@ export default {
   },
   mounted() {
     this.clicked();
-    
   },
 };
 </script>

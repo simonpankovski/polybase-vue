@@ -38,20 +38,24 @@
 </template>
 
 <script>
-import ModelForm from '../components/forms/ModelForm.vue';
-import TextureForm from '../components/forms/TextureForm.vue';
+import ModelForm from "../components/forms/ModelForm.vue";
+import TextureForm from "../components/forms/TextureForm.vue";
+import { mapGetters } from "vuex";
 export default {
-  components: {ModelForm, TextureForm},
+  components: { ModelForm, TextureForm },
   data() {
     return {
       tab: null,
+    };
+  },
+  beforeMount() {
+    if (this.getToken() === "") {
+      this.$router.push("/login");
     }
   },
-
   methods: {
-    
+    ...mapGetters(["getToken"]),
   },
- 
 };
 </script>
 

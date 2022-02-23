@@ -51,7 +51,9 @@ export default {
   props: ["modelId", "category"],
   methods: {
     metalnessFunc: function () {
+     
       if (this.mesh != null) {
+         console.log(this.mesh.material)
         this.mesh.material.metalness = this.metalness * 0.01;
         this.mesh.material.roughness = this.roughness * 0.01;
       }
@@ -80,12 +82,10 @@ export default {
           return res.json();
         })
         .then((blob) => {
-          console.log(this.category);
           if (blob.code == 200) {
             let message = blob.message;
             message.forEach((element) => {
-              let filename =
-                element.headers["content-disposition"][0].split("=")[1];
+              let filename = element.headers["content-disposition"][0].split("=")[1];
               if (filename.includes("COL")) {
                 this.color = element.file;
               } else if (filename.includes("AO")) {
@@ -135,7 +135,7 @@ export default {
       let colorMap = textureLoader.load(this.color);
       let normalMap = textureLoader.load(this.normal);
       let displacementMap = textureLoader.load(this.disp);
-      let roughnessMap = textureLoader.load(this.roughness);
+      //let roughnessMap = textureLoader.load(this.roughness);
       let aoMap = textureLoader.load(this.ao);
       let metalMap = textureLoader.load(this.metal);
       let self = this;
@@ -154,7 +154,7 @@ export default {
         const material = new Three.MeshStandardMaterial({
           map: colorMap,
           normalMap: normalMap,
-          roughnessMap: roughnessMap,
+          //roughnessMap: roughnessMap,
           roughness: roughnessValue,
           aoMap: aoMap,
           displacementMap: displacementMap,

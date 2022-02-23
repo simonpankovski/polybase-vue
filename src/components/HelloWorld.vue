@@ -27,7 +27,6 @@
         @click="clicked"
         ><span class="secondaryColor">Learn More</span></v-btn
       >
-      >
     </div>
   </div>
 </template>
@@ -55,18 +54,16 @@ export default {
       };
     },
   },
-  created: function () {
-    //v-if="this.file != ''"
-  },
 };
 </script>
 <style scoped lang="scss">
 $secondary-color: #fa7268;
 #main {
-  height: 100vh;
+  height: calc(100vh - 64px);
   background-position: center;
   background-size: cover;
 }
+
 .secondaryColor {
   color: $secondary-color;
 }

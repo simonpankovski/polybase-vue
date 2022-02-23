@@ -45,6 +45,30 @@ const routes = [
     name: "Cart",
     component: () => 
       import ("../views/Cart.vue")
+  },
+  {
+    path: "/profile",
+    name: "Profile",
+    component: () => 
+      import ("../views/Profile.vue")
+  },
+  {
+    path: "/purchases",
+    name: "Purchase",
+    component: () => 
+      import ("../views/Purchase.vue")
+  },
+  {
+    path: "/success",
+    name: "Success",
+    component: () => 
+      import ("../views/checkout/Success.vue")
+  },
+  {
+    path: "/cancel",
+    name: "cancel",
+    component: () => 
+      import ("../views/checkout/CancelOrder.vue")
   }
 ];
 

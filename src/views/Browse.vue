@@ -36,14 +36,16 @@
         </v-card>
       </v-col>
       <v-col>
-        <div class="d-flex">
-          <model
-            v-for="model in models"
-            :key="model.id"
-            :model-data="model"
-            :is-model="isModel"
-          ></model>
-        </div>
+        <v-row>
+          <v-col cols="12" sm="6" md="4" lg="3" v-for="model in models"
+        :key="model.id">
+            <model
+              :model-data="model"
+              :is-model="isModel"
+            ></model>
+          </v-col>
+        </v-row>
+        <div class="d-flex"></div>
         <div class="text-center">
           <v-pagination
             v-model="page"
@@ -90,6 +92,11 @@ export default {
     ],
     models: [],
   }),
+  beforeMount() {
+    if (this.getToken() === "") {
+        this.$router.push("/login");
+    }
+  },
   methods: {
     ...mapGetters(["getToken"]),
     pagination() {
@@ -107,8 +114,8 @@ export default {
         category = this.capitalizeFirstLetter(pathName[pathName.length - 1]);
         type = this.capitalizeFirstLetter(pathName[pathName.length - 2]);
       }
-      if (category == "All" || category == "all") category = ""
-      console.log(category)
+      if (category == "All" || category == "all") category = "";
+      console.log(category);
       if (type == "Models") {
         fetch(
           "http://localhost:8000/api/model/?category=" +
@@ -128,10 +135,8 @@ export default {
             this.pages = data[data.length - 1];
             this.isModel = true;
           });
-      }
-      else if (type == "Textures") {
-          
-          fetch(
+      } else if (type == "Textures") {
+        fetch(
           "http://localhost:8000/api/texture/?category=" +
             category +
             "&page=" +
@@ -164,7 +169,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 #vh100 {
   height: calc(100vh - 56px) !important;
 }
