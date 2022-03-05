@@ -23,13 +23,14 @@
           </td>
           <td>
             <v-rating
-              v-model="rating"
+              v-model="row.item.rating"
               color="yellow darken-3"
               background-color="grey darken-1"
               empty-icon="$ratingFull"
               half-increments
               hover
               large
+              @input="handleRatingChange(row.item)"
             ></v-rating>
           </td>
         </tr>
@@ -44,7 +45,6 @@ export default {
   data() {
     return {
       loading: true,
-      rating: 4.5,
       headers: [
         {
           text: "Model/ Texture name",
@@ -62,8 +62,24 @@ export default {
   },
   methods: {
     ...mapGetters(["getToken"]),
+    handleRatingChange(item){
+      let jwt = "Bearer " + this.getToken();
+       fetch("http://localhost:8000/api/purchase/" + item.objectId + "?type=" + item.type, {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          Authorization: jwt,
+          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({rating: item.rating})
+      })
+        .then((res) => res.json())
+        .then((json) => {
+          console.log(json)
+        });
+    },
     onButtonClick(obj) {
-      console.log(obj);
       let jwt = "Bearer " + this.getToken();
       fetch("http://localhost:8000/api/" + obj.type + "/" + obj.objectId, {
         method: "GET",

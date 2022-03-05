@@ -19,6 +19,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 export default {
   data: () => ({
     valid: false,
@@ -28,6 +29,9 @@ export default {
       (v) => /.+@.+/.test(v) || "E-mail must be valid",
     ],
   }),
+  methods: {
+    ...mapGetters(["getToken", ]),
+  },
   beforeMount() {
     if (this.getToken() === "") {
         this.$router.push("/login");

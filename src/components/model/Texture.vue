@@ -19,6 +19,7 @@
         :thumb-color="'orange'"
         @change="metalnessFunc"
       ></v-slider>
+      <div id="canvas"></div>
     </div>
   </div>
 </template>
@@ -39,13 +40,13 @@ export default {
       controls: null,
       file: "",
       roughness: 10,
-      color: "",
+      color: null,
       metalness: 45,
-      normal: "",
-      disp: "",
-      ao: "",
-      metal: "",
-      rough: "",
+      normal: null,
+      disp: null,
+      ao: null,
+      metal: null,
+      rough: null,
     };
   },
   props: ["modelId", "category"],
@@ -113,7 +114,7 @@ export default {
         });
     },
     init: function () {
-      let container = document.getElementById("container");
+      let container = document.getElementById("canvas");
 
       //const loader = new FBXLoader();
       this.camera = new Three.PerspectiveCamera(
@@ -123,7 +124,7 @@ export default {
         20
       );
       this.camera.position.z = 12;
-      const light = new Three.DirectionalLight(0xffffff, 1);
+      const light = new Three.DirectionalLight(0xffffff, 3);
 
       // move the light right, up, and towards us
       light.position.set(10, 10, 15);
@@ -135,7 +136,7 @@ export default {
       let colorMap = textureLoader.load(this.color);
       let normalMap = textureLoader.load(this.normal);
       let displacementMap = textureLoader.load(this.disp);
-      //let roughnessMap = textureLoader.load(this.roughness);
+      let roughnessMap = textureLoader.load(this.roughness);
       let aoMap = textureLoader.load(this.ao);
       let metalMap = textureLoader.load(this.metal);
       let self = this;
@@ -151,10 +152,11 @@ export default {
       let envmapLoader = new Three.PMREMGenerator(self.renderer);
       new RGBELoader().load(this.logo, function (hdrMap) {
         let envMap = envmapLoader.fromCubemap(hdrMap);
-        const material = new Three.MeshStandardMaterial({
+        self.scene.background = envMap.texture;
+        const material = new Three.MeshPhysicalMaterial({
           map: colorMap,
           normalMap: normalMap,
-          //roughnessMap: roughnessMap,
+          roughnessMap: roughnessMap,
           roughness: roughnessValue,
           aoMap: aoMap,
           displacementMap: displacementMap,
@@ -192,7 +194,10 @@ export default {
 
 <style scoped>
 #container {
-  width: 500px;
+  overflow-y: visible;
+}
+#canvas {
+  width: 40vw!important;
   height: 500px;
 }
 </style>

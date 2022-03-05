@@ -112,7 +112,7 @@ export default {
       thumbnails: [],
       rules: [
         (v) => v.length <= 50 || "Max 25 characters",
-        (v) => v.length > 5 || "Min 5 characters",
+        (v) => v.length >= 4 || "Min 4 characters",
       ],
       fileRules: [
         (v) => !!v || "At least one file is required",

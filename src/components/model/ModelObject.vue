@@ -20,13 +20,13 @@ export default {
       controls: null,
       file: "",
       roughness: 10,
-      color: "",
+      color: null,
       metalness: 45,
-      normal: "",
-      disp: "",
-      ao: "",
-      metal: "",
-      rough: "",
+      normal: null,
+      disp: null,
+      ao: null,
+      metal: null,
+      rough: null,
       isGlass: false,
       isMetal: false,
       hdr: require("@/assets/studio_country_hall_1k.hdr"),
@@ -76,7 +76,7 @@ export default {
       );
       this.camera.position.z = 4;
       this.camera.position.x = 100;
-      const light = new Three.DirectionalLight(0xffffff, 1);
+      const light = new Three.DirectionalLight(0xffffff, 2);
 
       // move the light right, up, and towards us
       light.position.set(10, 10, 15);
@@ -117,8 +117,12 @@ export default {
               } else if (filename.includes("METAL")) {
                 self.metal = element.file;
                 self.isMetal = true;
-              } else if (filename.includes("TRANS")) {
+              } else if (
+                filename.includes("TRANS") ||
+                filename.includes("SSS")
+              ) {
                 self.transmission = element.file;
+                if(filename.includes('TRANS'))
                 self.isGlass = true;
               }
             });
@@ -128,36 +132,35 @@ export default {
             let normalMap = textureLoader.load(self.normal);
             let aoMap = textureLoader.load(self.ao);
             let transmissionMap = textureLoader.load(self.transmission);
-            
+
             new RGBELoader().load(hdr, function (hdrMap) {
               let envMap = envmapLoader.fromCubemap(hdrMap);
+              let en = Three.EquirectangularReflectionMapping;
               self.scene.background = envMap.texture;
-              console.log(self.isMetal)
+              console.log(self.isMetal + " " + self.isGlass);
               const material = new Three.MeshPhysicalMaterial({
                 map: colorMap,
-                envMap: envMap.texture,
+                envMap: en,
                 normalMap: normalMap,
                 roughnessMap: roughnessMap,
-                roughness: 1,
-                metalness: 0,
+                transmissionMap,
                 aoMap,
+                opacity: 1,
               });
               console.log(material);
               if (self.isGlass) {
-                //material.color = 0xffffff;
-                material.map = null;
                 material.roughness = 0;
                 material.metalness = 0;
                 material.transmission = 1;
-                material.opacity = 1;
-                material.transmissionMap = transmissionMap;
-                material.normalScale = new Three.Vector2(0.01, 0.01);
-              } else if (self.metal != "") {
-                material.metalness = 1;
+                material.thickness = 0.02;
+                material.ior = 2;
+                
+              } else if (self.metal) {
+                /*material.metalness = 1;
                 material.roughness = 0;
-                material.transmission = 0;
-                material.normalScale = new Three.Vector2(1, 1);
+                material.ior = 1.5;*/
               }
+              if(self.ao != null)
               child.geometry.attributes.uv2 = child.geometry.attributes.uv;
               child.material = material;
             });

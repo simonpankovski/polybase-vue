@@ -8,11 +8,11 @@
 </template>
 
 <script>
-import NavBar from './components/nav/NavBar.vue'
+import NavBar from "./components/nav/NavBar.vue";
 export default {
   name: "App",
   components: {
-    NavBar
+    NavBar,
   },
 
   data: () => ({
@@ -21,27 +21,25 @@ export default {
 };
 </script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@400&display=swap");
 .v-application {
-   font-family: 'Quicksand', sans-serif !important;
- }
- body::-webkit-scrollbar-track
-{
-	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-	border-radius: 10px;
-	background-color: #F5F5F5;
+  font-family: "Quicksand", sans-serif !important;
 }
 
-body::-webkit-scrollbar
-{
-	width: 12px;
-	background-color: #F5F5F5;
+body::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  background-color: #f5f5f5;
 }
 
-body::-webkit-scrollbar-thumb
-{
-	border-radius: 10px;
-	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-	background-color: #555;
+body::-webkit-scrollbar {
+  width: 12px;
+  background-color: #f5f5f5;
+}
+
+body::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #555;
 }
 </style>

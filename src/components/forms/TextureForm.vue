@@ -104,7 +104,7 @@ export default {
       thumbnails: [],
       rules: [
         (v) => v.length <= 50 || "Max 25 characters",
-        (v) => v.length > 5 || "Min 5 characters",
+        (v) => v.length >= 4 || "Min 4 characters",
       ],
       fileRules: [
         (v) => !!v || "At least one file is required",
@@ -163,7 +163,7 @@ export default {
             this.text = res.message;
             if (res.code == 200) {
               setTimeout(() => {
-                this.$router.push("/browse");
+                this.$router.push("/browse/textures/all");
               }, 2000);
             }
           });

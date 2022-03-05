@@ -72,13 +72,10 @@
       >
         <v-icon large color="white"> mdi-cloud-download-outline</v-icon>
       </v-btn>
-      <v-overlay :z-index="zIndex" :value="overlay" style="width: 100%!important;">
-        <v-card elevation="2" style="height: 100vh, width: 100vw;">
-          <v-container>
-            <div
-              class="d-flex justify-space-between"
-              style="padding-top: 10px"
-            >
+      <v-overlay :z-index="zIndex" :value="overlay" class="align-end height">
+        <v-card elevation="2">
+          <v-container  id="container">
+            <div class="d-flex justify-space-between" style="padding-top: 10px">
               <v-snackbar class="mt-16" top v-model="snackbar">
                 {{ text }}
 
@@ -118,7 +115,7 @@
               </v-btn>
             </div>
             <v-row class="mt-16">
-              <v-col>
+              <v-col sm="12" md="6">
                 <v-carousel
                   :continuous="true"
                   :cycle="this.cycle"
@@ -126,6 +123,7 @@
                   hide-delimiter-background
                   delimiter-icon="mdi-minus"
                   height="300"
+                  class="d-flex justify-center"
                 >
                   <v-carousel-item
                     v-for="(item, i) in this.modelData.thumbnailLinks"
@@ -139,7 +137,7 @@
                   <h4 class="mt-5">{{ this.modelData.price }} $</h4>
                 </div>
               </v-col>
-              <v-col>
+              <v-col sm="12" md="6" lg="6" class="px-0">
                 <model-object
                   :model-id="this.modelData.id"
                   v-if="this.isModel"
@@ -249,7 +247,27 @@ export default {
 </script>
 
 <style scoped>
-.v-overlay__content {
-  widows: 100%!important;
+.height {
+  height: 100vh;
+  width: 100vw;
+}
+#container {
+  overflow-y: visible;
+}
+#container::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  background-color: #f5f5f5;
+}
+
+#container::-webkit-scrollbar {
+  width: 12px;
+  background-color: #f5f5f5;
+}
+
+#container::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #555;
 }
 </style>

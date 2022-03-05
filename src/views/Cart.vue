@@ -28,7 +28,7 @@
         <v-btn
           style="position: absolute; margin: 10px 20px; background: orange"
           @click="overlay = !overlay"
-          :disabled="items.length==0"
+          :disabled="items.length == 0"
         >
           Checkout
         </v-btn>
@@ -38,15 +38,22 @@
       <v-btn class="white--text mb-10" @click="overlay = false">
         <v-icon dark> mdi-close </v-icon>
       </v-btn>
-      <div>
+
+      <v-card elevation="2">
+        <v-card-text>
+          <h2>Card Credentials</h2>
+        </v-card-text>
         <stripe-element-card
           :pk="publishableKey"
           ref="elementRef"
           @token="tokenCreated"
           style="width: 100vh"
+          class="px-2 my-5"
         ></stripe-element-card>
-        <v-btn @click="submit" color="green">Proceed</v-btn>
-      </div>
+        <v-card-actions>
+          <v-btn @click="submit" color="orange">Proceed</v-btn>
+        </v-card-actions>
+      </v-card>
     </v-overlay>
   </v-container>
 </template>
@@ -83,7 +90,7 @@ export default {
   },
   beforeMount() {
     if (this.getToken() === "") {
-        this.$router.push("/login");
+      this.$router.push("/login");
     }
   },
   methods: {
@@ -110,7 +117,7 @@ export default {
         .then((data) => {
           if (data.code == 200) {
             this.$store.commit("setCart", 0);
-            this.items = []
+            this.items = [];
           }
         });
     },

@@ -1,6 +1,6 @@
 <template>
-  <v-app-bar app color="grey darken-4" fixed class="px-7">
-    <div class="d-flex align-center">
+  <div>
+    <v-app-bar color="grey darken-4" class="px-7">
       <router-link to="/" class="d-flex align-center white--text"
         ><v-img
           class="mr-2"
@@ -11,61 +11,134 @@
           width="40"
         />Polybase</router-link
       >
-    </div>
-    <v-spacer></v-spacer>
-    <template v-if="this.user == ''">
-      <router-link to="/login" class="mr-8 py-2 px-10" id="login"
-        >Login</router-link
-      >
-      <router-link to="/register" class="py-2 px-10" id="register"
-        >Register</router-link
-      >
-    </template>
-    <template v-else>
-      <router-link to="/browse/models/all" class="pr-2">
-        <v-btn color="transparent" dark>
-          <v-icon dark> mdi-toy-brick-search </v-icon>
-        </v-btn>
-      </router-link>
-      <router-link to="/sell" class="pr-2">
-        <v-btn color="transparent" dark>
-          <v-icon dark> mdi-cloud-upload </v-icon></v-btn
-        ></router-link
-      >
-      <router-link to="/cart" class="pr-2"
-        ><v-btn color="transparent" dark
-          ><v-icon dark> mdi-cart </v-icon
-          ><span id="cartCount" v-if="cartCount > 0">{{
-            this.cartCount
-          }}</span></v-btn
-        ></router-link
-      >
-      <span class="pr-2 link">
-        <div class="text-center">
-          <v-menu offset-y>
-            <template v-slot:activator="{ on }">
-              <v-btn color="transparent" dark v-on="on">
-                <v-icon dark> mdi-account </v-icon>
+      <v-spacer></v-spacer>
+      <v-app-bar-nav-icon
+        @click="drawer = true"
+        color="white"
+        v-if="this.windowWidth < 1280"
+      ></v-app-bar-nav-icon>
+      <div v-else>
+        <template v-if="this.user == ''" class="d-flex">
+          <router-link to="/login" class="mx-8 py-2 px-5" id="login"
+            >Login</router-link
+          >
+          <router-link to="/register" class="py-2 px-5" id="register"
+            >Register</router-link
+          >
+        </template>
+        <template v-else>
+          <div class="d-flex">
+            <router-link to="/browse/models/all" class="pr-4">
+              <v-btn color="transparent" dark>
+                <v-icon dark> mdi-toy-brick-search </v-icon>
               </v-btn>
-            </template>
-            <v-list>
-              <v-list-item v-for="(item, index) in items" :key="index">
-                <router-link
-                  class="black--text"
-                  :to="'/' + item.title.toLowerCase()"
-                >
-                  <v-list-item-title>
-                    {{ item.title }}
-                  </v-list-item-title>
-                </router-link>
-              </v-list-item>
-            </v-list>
-          </v-menu>
+            </router-link>
+            <router-link to="/sell" class="pr-4">
+              <v-btn color="transparent" dark>
+                <v-icon dark> mdi-cloud-upload </v-icon></v-btn
+              ></router-link
+            >
+            <router-link to="/cart" class="pr-4"
+              ><v-btn color="transparent" dark
+                ><v-icon dark> mdi-cart </v-icon
+                ><span id="cartCount" v-if="cartCount > 0">{{
+                  this.cartCount
+                }}</span></v-btn
+              ></router-link
+            >
+            <span class="pr-4 link">
+              <div class="text-center">
+                <v-menu offset-y>
+                  <template v-slot:activator="{ on }">
+                    <v-btn color="transparent" dark v-on="on">
+                      <v-icon dark> mdi-account </v-icon>
+                    </v-btn>
+                  </template>
+                  <v-list>
+                    <v-list-item v-for="(item, index) in items" :key="index">
+                      <router-link
+                        class="black--text"
+                        :to="'/' + item.title.toLowerCase()"
+                      >
+                        <v-list-item-title>
+                          {{ item.title }}
+                        </v-list-item-title>
+                      </router-link>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+              </div>
+            </span>
+            <span class="link" @click="logout">Logout</span>
+          </div>
+        </template>
+      </div>
+    </v-app-bar>
+
+    <v-navigation-drawer
+      v-model="drawer"
+      absolute
+      temporary
+      color="grey darken-4"
+    >
+      <template v-if="this.user == ''" class="d-flex">
+        <div class="d-flex flex-column">
+          <router-link to="/login" class="mx-15 mt-10 py-2 px-5" id="login"
+            >Login</router-link
+          >
+          <router-link to="/register" class="mx-15 mt-5 py-2 px-5" id="register"
+            >Register</router-link
+          >
         </div>
-      </span>
-      <span class="link" @click="logout">Logout</span>
-    </template>
-  </v-app-bar>
+      </template>
+      <template v-else>
+        <div class="d-flex flex-column">
+          <router-link to="/browse/models/all" class="text-center mt-5">
+            <v-btn color="transparent" dark>
+              <v-icon dark> mdi-toy-brick-search </v-icon>
+            </v-btn>
+          </router-link>
+          <router-link to="/sell" class="text-center mt-5">
+            <v-btn color="transparent" dark>
+              <v-icon dark> mdi-cloud-upload </v-icon></v-btn
+            ></router-link
+          >
+          <router-link to="/cart" class="text-center mt-5" 
+            ><v-btn color="transparent" dark
+              ><v-icon dark> mdi-cart </v-icon
+              ><span id="cartCount" v-if="cartCount > 0">{{
+                this.cartCount
+              }}</span></v-btn
+            ></router-link
+          >
+          <span class="link">
+            <div class="text-center mt-5">
+              <v-menu offset-y>
+                <template v-slot:activator="{ on }">
+                  <v-btn color="transparent" dark v-on="on">
+                    <v-icon dark> mdi-account </v-icon>
+                  </v-btn>
+                </template>
+                <v-list>
+                  <v-list-item v-for="(item, index) in items" :key="index">
+                    <router-link
+                      class="black--text"
+                      :to="'/' + item.title.toLowerCase()"
+                    >
+                      <v-list-item-title>
+                        {{ item.title }}
+                      </v-list-item-title>
+                    </router-link>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </div>
+          </span>
+          <span class="link text-center mt-5" @click="logout">Logout</span>
+        </div>
+      </template>
+    </v-navigation-drawer>
+  </div>
 </template>
 
 <script>
@@ -78,6 +151,9 @@ export default {
     user: "",
     cartCount: 0,
     items: [{ title: "Profile" }, { title: "Purchases" }],
+    drawer: false,
+    group: null,
+    windowWidth: window.innerWidth,
   }),
   methods: {
     ...mapGetters(["getToken", "getCart"]),
@@ -103,13 +179,11 @@ export default {
       })
         .then((res) => res.json())
         .then((data) => {
-          console.log(data)
-          if(data.code == 200){
+          console.log(data);
+          if (data.code == 200) {
             this.cartCount = data.message;
-            this.$store.commit("setCart", data.message)
-            console.log(this.getCart())
+            this.$store.commit("setCart", data.message);
           }
-          
         });
     },
   },
@@ -122,19 +196,33 @@ export default {
     }
   },
   computed: {
-    count () {
+    count() {
       return this.getCart();
       // Or return basket.getters.fruitsCount
       // (depends on your design decisions).
-    }
+    },
+    width() {
+      return this.windowWidth;
+    },
+    isMobile() {
+      return this.windowWidth < 1280;
+    },
   },
   watch: {
-    count (newCount, oldCount) {
+    count(newCount, oldCount) {
       // Our fancy notification (2).
       this.cartCount = newCount;
-      console.log(`We have ${newCount} fruits now, yay! ${oldCount}`)
-    }
-  }
+      console.log(`We have ${newCount} fruits now, yay! ${oldCount}`);
+    },
+    width(newWidth, oldWidth) {
+      console.log(newWidth, oldWidth);
+    },
+  },
+  mounted() {
+    window.addEventListener("resize", () => {
+      this.windowWidth = window.innerWidth;
+    });
+  },
 };
 </script>
 
@@ -145,23 +233,36 @@ export default {
 }
 .link {
   color: white;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  flex-direction: column;
+  text-align: center!important;
   &:hover {
     cursor: pointer;
   }
 }
 #login {
   border: 1px solid orange;
-  border-top-left-radius: 50px;
-  border-bottom-left-radius: 50px;
-  border-top-right-radius: 50px;
-  border-bottom-right-radius: 50px;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  transition: 0.3s;
+  &:hover {
+    border: 1px solid rgb(246, 225, 186);
+  }
 }
 #register {
   background: orange;
-  border-top-left-radius: 50px;
-  border-bottom-left-radius: 50px;
-  border-top-right-radius: 50px;
-  border-bottom-right-radius: 50px;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  transition: 0.3s;
+  &:hover {
+    background: rgb(255, 190, 68);
+  }
 }
 #cartCount {
   position: absolute;
