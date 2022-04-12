@@ -36,6 +36,23 @@
         </tr>
       </template>
     </v-data-table>
+    <v-snackbar
+      v-model="snackbar"
+      :timeout="timeout"
+    >
+      {{ text }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          color="pink"
+          text
+          v-bind="attrs"
+          @click="snackbar = false"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -58,6 +75,9 @@ export default {
         { text: "Rating", value: "rating" },
       ],
       items: [],
+      snackbar: false,
+      text: `Rating updated successfully!`,
+      timeout: 3000
     };
   },
   methods: {
@@ -76,6 +96,7 @@ export default {
       })
         .then((res) => res.json())
         .then((json) => {
+          this.snackbar = true;
           console.log(json)
         });
     },

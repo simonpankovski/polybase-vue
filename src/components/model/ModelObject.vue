@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div id="container"></div>
+  <div class="heightHundred">
+    <div id="canvas" class="heightHundred"></div>
   </div>
 </template>
 
@@ -65,8 +65,7 @@ export default {
         });
     },
     init: function (blob, textures) {
-      let container = document.getElementById("container");
-
+      let container = document.getElementById("canvas");
       const loader = new FBXLoader();
       this.camera = new Three.PerspectiveCamera(
         70,
@@ -77,14 +76,10 @@ export default {
       this.camera.position.z = 4;
       this.camera.position.x = 100;
       const light = new Three.DirectionalLight(0xffffff, 2);
-
-      // move the light right, up, and towards us
       light.position.set(10, 10, 15);
       this.scene = new Three.Scene();
       this.scene.background = new Three.Color("#575454");
       let self = this;
-      // create a Mesh containing the geometry and material
-      //loader.setResourcePath( 'http://localhost:8000/models/chair/textures/' );
       let hdr = this.hdr;
       const textureLoader = new Three.TextureLoader();
       this.renderer = new Three.WebGLRenderer({ antialias: true });
@@ -122,8 +117,7 @@ export default {
                 filename.includes("SSS")
               ) {
                 self.transmission = element.file;
-                if(filename.includes('TRANS'))
-                self.isGlass = true;
+                if (filename.includes("TRANS")) self.isGlass = true;
               }
             });
             let envmapLoader = new Three.PMREMGenerator(self.renderer);
@@ -154,14 +148,13 @@ export default {
                 material.transmission = 1;
                 material.thickness = 0.02;
                 material.ior = 2;
-                
               } else if (self.metal) {
-                /*material.metalness = 1;
+                material.metalness = 1;
                 material.roughness = 0;
-                material.ior = 1.5;*/
+                material.ior = 1.5;
               }
-              if(self.ao != null)
-              child.geometry.attributes.uv2 = child.geometry.attributes.uv;
+              if (self.ao != null)
+                child.geometry.attributes.uv2 = child.geometry.attributes.uv;
               child.material = material;
             });
           }
@@ -175,6 +168,8 @@ export default {
       this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     },
     animate() {
+      let container = document.getElementById("canvas");
+      this.renderer.setSize(container.clientWidth, container.clientHeight);
       requestAnimationFrame(this.animate);
       this.controls.update();
       this.renderer.render(this.scene, this.camera);
@@ -185,9 +180,14 @@ export default {
   },
 };
 </script>
-<style scoped>
-#container {
-  width: 500px;
-  height: 500px;
+<style scoped lang="scss">
+#canvas {
+  width: 100% !important;
+  canvas {
+    width: 80%;
+  }
+}
+.heightHundred {
+  height: 100%;
 }
 </style>

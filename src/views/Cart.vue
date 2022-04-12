@@ -54,6 +54,23 @@
           <v-btn @click="submit" color="orange">Proceed</v-btn>
         </v-card-actions>
       </v-card>
+      <v-snackbar
+      v-model="snackbar"
+      :timeout="timeout"
+    >
+      {{ text }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          color="pink"
+          text
+          v-bind="attrs"
+          @click="snackbar = false"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
     </v-overlay>
   </v-container>
 </template>
@@ -86,6 +103,9 @@ export default {
         { text: "Remove", value: "remove" },
       ],
       items: [],
+      snackbar: false,
+      text: `Hello, I'm a snackbar`,
+      timeout: 5000
     };
   },
   beforeMount() {
@@ -118,6 +138,8 @@ export default {
           if (data.code == 200) {
             this.$store.commit("setCart", 0);
             this.items = [];
+            this.snackbar = true;
+      
           }
         });
     },
@@ -134,7 +156,6 @@ export default {
         .then((res) => res.json())
         .then((data) => {
           this.secret = data.clientSecret;
-          console.log(this.secret);
         });
     },
     checkout() {},

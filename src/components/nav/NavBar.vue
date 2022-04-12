@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="z-index:2;">
     <v-app-bar color="grey darken-4" class="px-7">
       <router-link to="/" class="d-flex align-center white--text"
         ><v-img

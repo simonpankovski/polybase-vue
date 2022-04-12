@@ -1,32 +1,39 @@
 <template>
   <v-container class="mt-10" id="container">
-    <h1>Register</h1>
-    <form @submit.prevent="login">
-      <v-text-field
-        label="Email"
-        hide-details="auto"
-        :rules="emailRules"
-        v-model="email"
-        name="username"
-      ></v-text-field>
-      <v-text-field
-        label="Password"
-        :rules="passwordRules"
-        hide-details="auto"
-        type="password"
-        v-model="password"
-        name="password"
-      ></v-text-field>
-      <v-text-field
-        label="Confirm Password"
-        hide-details="auto"
-        :rules="[passwordConfirmationRule]"
-        type="password"
-        ref="password"
-        v-model="confirmPassword"
-      ></v-text-field>
-      <v-btn class="mt-10 orange darken-2 accent-2 white--text" type="submit"> submit </v-btn>
-    </form>
+    <v-card color="grey darken-4" class="pa-8">
+      <h1 class="white--text">Register</h1>
+      <form @submit.prevent="login">
+        <v-text-field
+          label="Email"
+          hide-details="auto"
+          :rules="emailRules"
+          v-model="email"
+          name="username"
+          dark
+        ></v-text-field>
+        <v-text-field
+          dark
+          label="Password"
+          :rules="passwordRules"
+          hide-details="auto"
+          type="password"
+          v-model="password"
+          name="password"
+        ></v-text-field>
+        <v-text-field
+          dark
+          label="Confirm Password"
+          hide-details="auto"
+          :rules="[passwordConfirmationRule]"
+          type="password"
+          ref="password"
+          v-model="confirmPassword"
+        ></v-text-field>
+        <v-btn class="mt-10 orange darken-2 accent-2 white--text" type="submit">
+          submit
+        </v-btn>
+      </form>
+    </v-card>
   </v-container>
 </template>
 
@@ -79,10 +86,10 @@ export default {
         const value = Object.fromEntries(data.entries());
         fetch("http://localhost:8000/api/register", {
           method: "POST",
-          mode: 'cors',
+          mode: "cors",
           headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': "*",
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
           },
           body: JSON.stringify(value),
         })
@@ -106,6 +113,6 @@ export default {
 
 <style lang="scss" scoped>
 #container {
-  width: 30%;
+  width: 50%;
 }
 </style>

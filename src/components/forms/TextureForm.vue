@@ -1,94 +1,96 @@
 <template>
-  <v-form
-    ref="form"
-    v-model="valid"
-    lazy-validation
-    @submit.prevent="handleSubmit"
-  >
-    <v-text-field
-      v-model="title"
-      :rules="rules"
-      counter="50"
-      name="name"
-      label="Texture Name"
-    ></v-text-field>
-    <v-card flat color="transparent">
-      <v-subheader>Price in EUR</v-subheader>
+  <v-container>
+    <v-form
+      ref="form"
+      v-model="valid"
+      lazy-validation
+      @submit.prevent="handleSubmit"
+    >
+      <v-text-field
+        v-model="title"
+        :rules="rules"
+        counter="50"
+        name="name"
+        label="Texture Name"
+      ></v-text-field>
+      <v-card flat color="transparent">
+        <v-subheader>Price in EUR</v-subheader>
 
-      <v-card-text>
-        <v-row>
-          <v-col>
-            <v-slider
-              v-model="slider"
-              class="align-center"
-              :max="max"
-              :min="min"
-              hide-details
-            >
-              <template v-slot:append>
-                <v-text-field
-                  v-model="slider"
-                  name="price"
-                  class="mt-0 pt-0"
-                  hide-details
-                  single-line
-                  type="number"
-                  style="width: 60px"
-                ></v-text-field>
-              </template>
-            </v-slider>
-          </v-col>
-        </v-row>
-      </v-card-text>
-    </v-card>
-    <v-file-input
-      small-chips
-      multiple
-      counter
-      required
-      v-model="thumbnails"
-      :rules="thumbnailRules"
-      name="thumbnails"
-      accept="image/*"
-      label="Upload thumbnails"
-    ></v-file-input>
-    <v-file-input
-      small-chips
-      multiple
-      counter
-      :rules="fileRules"
-      name="format"
-      v-model="format"
-      required
-      label="Upload texture files"
-    ></v-file-input>
-    <v-select
-      :items="categories"
-      label="Category"
-      v-model="category"
-      :rules="categoryRules"
-      name="category"
-      required
-    ></v-select>
-    <div class="text-center">
-      <v-btn color="deep-orange accent-2" class="white--text" type="submit">
-        Submit
-      </v-btn>
+        <v-card-text>
+          <v-row>
+            <v-col>
+              <v-slider
+                v-model="slider"
+                class="align-center"
+                :max="max"
+                :min="min"
+                hide-details
+              >
+                <template v-slot:append>
+                  <v-text-field
+                    v-model="slider"
+                    name="price"
+                    class="mt-0 pt-0"
+                    hide-details
+                    single-line
+                    type="number"
+                    style="width: 60px"
+                  ></v-text-field>
+                </template>
+              </v-slider>
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
+      <v-file-input
+        small-chips
+        multiple
+        counter
+        required
+        v-model="thumbnails"
+        :rules="thumbnailRules"
+        name="thumbnails"
+        accept="image/*"
+        label="Upload thumbnails"
+      ></v-file-input>
+      <v-file-input
+        small-chips
+        multiple
+        counter
+        :rules="fileRules"
+        name="format"
+        v-model="format"
+        required
+        label="Upload texture files"
+      ></v-file-input>
+      <v-select
+        :items="categories"
+        label="Category"
+        v-model="category"
+        :rules="categoryRules"
+        name="category"
+        required
+      ></v-select>
+      <div class="text-center">
+        <v-btn color="deep-orange accent-2" class="white--text" type="submit">
+          Submit
+        </v-btn>
 
-      <v-overlay :value="overlay">
-        <v-snackbar v-model="snackbar" :timeout="100000">
-          {{ text }}
+        <v-overlay :value="overlay">
+          <v-snackbar v-model="snackbar" :timeout="100000">
+            {{ text }}
 
-          <template v-slot:action="{ attrs }">
-            <v-btn color="pink" text v-bind="attrs" @click="snackbar = false">
-              Close
-            </v-btn>
-          </template>
-        </v-snackbar>
-        <v-progress-circular indeterminate size="64"></v-progress-circular>
-      </v-overlay>
-    </div>
-  </v-form>
+            <template v-slot:action="{ attrs }">
+              <v-btn color="pink" text v-bind="attrs" @click="snackbar = false">
+                Close
+              </v-btn>
+            </template>
+          </v-snackbar>
+          <v-progress-circular indeterminate size="64"></v-progress-circular>
+        </v-overlay>
+      </div>
+    </v-form>
+  </v-container>
 </template>
 
 <script>

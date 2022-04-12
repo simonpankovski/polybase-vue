@@ -1,11 +1,8 @@
 <template>
-  <div class="d-flex">
-    <v-row>
-      <v-col cols="12"
-            sm="3"
-            md="3"
-            lg="2">
-        <v-card max-width="500">
+  <div id="main">
+    <v-row class="mx-0">
+      <v-col class="px-0" cols="12" sm="3" md="3" lg="2" >
+        <v-card dark>
           <v-list class="pt-0 px-0">
             <v-list-group
               v-for="item in items"
@@ -39,21 +36,19 @@
         </v-card>
       </v-col>
       <v-col>
-        <v-row>
+        <v-row class="mx-0">
           <v-col
+            
             cols="12"
             sm="6"
             md="4"
             lg="3"
-            
             v-for="model in models"
             :key="model.id"
-            
           >
             <model :model-data="model" :is-model="isModel" class="mx-auto"></model>
           </v-col>
         </v-row>
-        <div class="d-flex"></div>
         <div class="text-center">
           <v-pagination
             v-model="page"
@@ -142,7 +137,7 @@ export default {
             this.models = data.slice(0, data.length - 1);
             this.pages = data[data.length - 1];
             this.isModel = true;
-            console.log(this.models)
+            console.log(this.models);
           });
       } else if (type == "Textures") {
         fetch(
@@ -162,7 +157,7 @@ export default {
             this.models = data.slice(0, data.length - 1);
             this.pages = data[data.length - 1];
             this.isModel = false;
-            console.log(this.models)
+            console.log(this.models);
           });
       }
     },
@@ -180,14 +175,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#vh100 {
-  height: calc(100vh - 56px) !important;
-}
 .no-style {
   text-decoration: none;
-  color: rgba(0, 0, 0, 0.87) !important;
+  color: rgba(255, 255, 255, 0.87) !important;
 }
 .router-link-active {
+  color: orange !important;
+}
+.v-application .primary--text {
   color: orange !important;
 }
 </style>

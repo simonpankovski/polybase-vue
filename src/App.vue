@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app id="main">
     <nav-bar></nav-bar>
     <v-main>
       <router-view />
@@ -41,5 +41,8 @@ body::-webkit-scrollbar-thumb {
   border-radius: 10px;
   -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
   background-color: #555;
+}
+#main {
+  background: rgb(49, 49, 49);
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div id="container">
+  <div class="wrapper">
+    <v-container>
       <v-subheader class="pl-0">
         <h2>Metalness</h2>
       </v-subheader>
@@ -19,6 +19,8 @@
         :thumb-color="'orange'"
         @change="metalnessFunc"
       ></v-slider>
+    </v-container>
+    <div class="wrapper">
       <div id="canvas"></div>
     </div>
   </div>
@@ -52,9 +54,7 @@ export default {
   props: ["modelId", "category"],
   methods: {
     metalnessFunc: function () {
-     
       if (this.mesh != null) {
-         console.log(this.mesh.material)
         this.mesh.material.metalness = this.metalness * 0.01;
         this.mesh.material.roughness = this.roughness * 0.01;
       }
@@ -71,7 +71,7 @@ export default {
     },
     clicked: function () {
       let token = "Bearer " + this.getToken();
-      fetch("http://localhost:8000/api/texture/" + this.modelId, {
+      fetch("http://localhost:8000/api/texture/" + this.modelId + "?browse=true", {
         method: "GET",
         mode: "cors",
         headers: {
@@ -86,7 +86,8 @@ export default {
           if (blob.code == 200) {
             let message = blob.message;
             message.forEach((element) => {
-              let filename = element.headers["content-disposition"][0].split("=")[1];
+              let filename =
+                element.headers["content-disposition"][0].split("=")[1];
               if (filename.includes("COL")) {
                 this.color = element.file;
               } else if (filename.includes("AO")) {
@@ -97,13 +98,10 @@ export default {
                 this.normal = element.file;
               } else if (
                 filename.includes("ROUGH") ||
-                filename.includes("REFL")
-              ) {
-                this.rough = element.file;
-              } else if (
-                filename.includes("METAL") ||
                 filename.includes("GLOSS")
               ) {
+                this.rough = element.file;
+              } else if (filename.includes("METAL")) {
                 this.metal = element.file;
               }
             });
@@ -136,9 +134,9 @@ export default {
       let colorMap = textureLoader.load(this.color);
       let normalMap = textureLoader.load(this.normal);
       let displacementMap = textureLoader.load(this.disp);
-      let roughnessMap = textureLoader.load(this.roughness);
+      //let roughnessMap = textureLoader.load(this.roughness);
       let aoMap = textureLoader.load(this.ao);
-      let metalMap = textureLoader.load(this.metal);
+      //let metalMap = textureLoader.load(this.metal);
       let self = this;
       self.renderer = new Three.WebGLRenderer({ antialias: true });
       self.renderer.outputEncoding = Three.sRGBEncoding;
@@ -156,11 +154,12 @@ export default {
         const material = new Three.MeshPhysicalMaterial({
           map: colorMap,
           normalMap: normalMap,
-          roughnessMap: roughnessMap,
+          //roughnessMap: roughnessMap,
           roughness: roughnessValue,
           aoMap: aoMap,
           displacementMap: displacementMap,
-          metalnessMap: metalMap,
+          displacementScale: 0.1,
+          //metalnessMap: metalMap,
           metalness: metalnessValue,
           envMap: envMap.texture,
         });
@@ -180,6 +179,8 @@ export default {
       });
     },
     animate() {
+      let container = document.getElementById("canvas");
+      this.renderer.setSize(container.clientWidth, container.clientHeight);
       requestAnimationFrame(this.animate);
       this.controls.update();
       this.renderer.render(this.scene, this.camera);
@@ -192,12 +193,15 @@ export default {
 };
 </script>
 
-<style scoped>
-#container {
-  overflow-y: visible;
-}
+<style scoped lang="scss">
 #canvas {
-  width: 40vw!important;
-  height: 500px;
+  width: 100% !important;
+  height: 100%;
+  canvas {
+    width: 80%;
+  }
+}
+.wrapper {
+  height: 80% !important;
 }
 </style>

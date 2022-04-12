@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-card>
+    <v-card color="grey darken-2">
       <v-tabs
         v-model="tab"
         background-color="deep-orange accent-2"
@@ -21,16 +21,16 @@
         </v-tab>
       </v-tabs>
 
-      <v-tabs-items v-model="tab">
+      <v-tabs-items v-model="tab" dark>
         <v-tab-item :value="'tab-1'">
-          <v-container>
+          
             <model-form></model-form>
-          </v-container>
+          
         </v-tab-item>
         <v-tab-item :value="'tab-2'">
-          <v-container>
+          
             <texture-form></texture-form>
-          </v-container>
+          
         </v-tab-item>
       </v-tabs-items>
     </v-card>

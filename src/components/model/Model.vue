@@ -1,5 +1,5 @@
 <template>
-  <v-card :loading="loading" max-width="374">
+  <v-card :loading="loading" max-width="374" dark>
     <template slot="progress">
       <v-progress-linear
         color="deep-purple"
@@ -61,8 +61,8 @@
     </v-card-text>
 
     <v-card-actions class="justify-space-between">
-      <v-btn class="white--text" @click="overlay = !overlay">
-        <v-icon large color="grey darken-4"> mdi-cart </v-icon>
+      <v-btn color="orange" @click="overlay = !overlay">
+        <v-icon large color="white"> mdi-cart </v-icon>
       </v-btn>
       <v-btn
         color="orange"
@@ -72,9 +72,9 @@
       >
         <v-icon large color="white"> mdi-cloud-download-outline</v-icon>
       </v-btn>
-      <v-overlay :z-index="zIndex" :value="overlay" class="align-end height">
+      <v-overlay :z-index="zIndex" :value="overlay" class="fullHeight">
         <v-card elevation="2">
-          <v-container  id="container">
+          <v-container  id="container" class="height">
             <div class="d-flex justify-space-between" style="padding-top: 10px">
               <v-snackbar class="mt-16" top v-model="snackbar">
                 {{ text }}
@@ -114,7 +114,7 @@
                 <v-icon large color="white"> mdi-cart </v-icon>
               </v-btn>
             </div>
-            <v-row class="mt-16">
+            <v-row class="mt-16" style="height: 50vh;">
               <v-col sm="12" md="6">
                 <v-carousel
                   :continuous="true"
@@ -129,7 +129,7 @@
                     v-for="(item, i) in this.modelData.thumbnailLinks"
                     :key="i"
                   >
-                    <v-img :src="item" height="300" width="500"></v-img>
+                    <v-img :src="item" max-height="300" max-width="400"></v-img>
                   </v-carousel-item>
                 </v-carousel>
                 <div class="mt-10 ml-5">
@@ -137,7 +137,7 @@
                   <h4 class="mt-5">{{ this.modelData.price }} $</h4>
                 </div>
               </v-col>
-              <v-col sm="12" md="6" lg="6" class="px-0">
+              <v-col sm="12" md="6" lg="6">
                 <model-object
                   :model-id="this.modelData.id"
                   v-if="this.isModel"
@@ -189,8 +189,11 @@ export default {
       return JSON.parse(payload.toString());
     },
     downloadModel: function () {
+      console.log(this.modelData.id)
+      let type = this.isModel ? "model" : "texture";
       let jwt = "Bearer " + this.getToken();
-      fetch("http://localhost:8000/api/model/" + this.modelData.id, {
+      
+      fetch("http://localhost:8000/api/"+ type + "/" + this.modelData.id, {
         method: "GET",
         mode: "cors",
         headers: {
@@ -247,27 +250,15 @@ export default {
 </script>
 
 <style scoped>
-.height {
+.fullHeight {
   height: 100vh;
   width: 100vw;
 }
+.height {
+  height: 80vh;
+  width: 80vw;
+}
 #container {
   overflow-y: visible;
-}
-#container::-webkit-scrollbar-track {
-  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-  border-radius: 10px;
-  background-color: #f5f5f5;
-}
-
-#container::-webkit-scrollbar {
-  width: 12px;
-  background-color: #f5f5f5;
-}
-
-#container::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-  background-color: #555;
 }
 </style>
