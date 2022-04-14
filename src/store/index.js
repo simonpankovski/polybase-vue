@@ -6,7 +6,8 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     token: null,
-    cart: 0
+    cart: 0,
+    searchTerm: ""
   },
   mutations: {
     setToken(state, token) {
@@ -25,7 +26,10 @@ export default new Vuex.Store({
     },
     setCart(state, count) {
       state.cart = count;
-    }
+    },
+    setSearchTerm(state, searchTerm) {
+      state.searchTerm = searchTerm;
+    },
   },
   getters: {
     getToken: () => {
@@ -33,7 +37,10 @@ export default new Vuex.Store({
     },
     getCart: (state) => {
       return state.cart;
-    }
+    },
+    getSearchTerm(state) {
+      return state.searchTerm;
+    },
   },
   actions: {
   },

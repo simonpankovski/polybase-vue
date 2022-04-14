@@ -1,5 +1,5 @@
 <template>
-  <div style="z-index:2;">
+  <div style="z-index: 2">
     <v-app-bar color="grey darken-4" class="px-7">
       <router-link to="/" class="d-flex align-center white--text"
         ><v-img
@@ -28,6 +28,15 @@
         </template>
         <template v-else>
           <div class="d-flex">
+            <div class="pr-4 relative">
+              <input
+                name="txtName"
+                id="search"
+                @input="search"
+                v-model="searchText"
+              />
+              <v-icon id="magnify" dark> mdi-magnify </v-icon>
+            </div>
             <router-link to="/browse/models/all" class="pr-4">
               <v-btn color="transparent" dark>
                 <v-icon dark> mdi-toy-brick-search </v-icon>
@@ -103,7 +112,7 @@
               <v-icon dark> mdi-cloud-upload </v-icon></v-btn
             ></router-link
           >
-          <router-link to="/cart" class="text-center mt-5" 
+          <router-link to="/cart" class="text-center mt-5"
             ><v-btn color="transparent" dark
               ><v-icon dark> mdi-cart </v-icon
               ><span id="cartCount" v-if="cartCount > 0">{{
@@ -148,6 +157,7 @@ export default {
   name: "NavBar",
 
   data: () => ({
+    searchText: "",
     user: "",
     cartCount: 0,
     items: [{ title: "Profile" }, { title: "Purchases" }],
@@ -157,7 +167,17 @@ export default {
   }),
   methods: {
     ...mapGetters(["getToken", "getCart"]),
-    ...mapMutations(["removeToken", "setCart"]),
+    ...mapMutations([
+      "removeToken",
+      "setCart",
+      "setSearchTerm",
+    ]),
+    capitalizeFirstLetter(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    },
+    search() {
+      this.$store.commit("setSearchTerm", this.searchText);
+    },
     parseJwt(token) {
       var base64Payload = token.split(".")[1];
       var payload = Buffer.from(base64Payload, "base64");
@@ -227,6 +247,20 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.relative {
+  position: relative;
+  display: flex;
+}
+#magnify {
+  right: 20px;
+  top: 20%;
+  position: absolute;
+  z-index: 2;
+}
+#search {
+  border-bottom: 1px solid white;
+  color: white;
+}
 .v-application a {
   color: white;
   text-decoration: none;
@@ -237,7 +271,7 @@ export default {
   justify-content: center;
   align-content: center;
   flex-direction: column;
-  text-align: center!important;
+  text-align: center !important;
   &:hover {
     cursor: pointer;
   }

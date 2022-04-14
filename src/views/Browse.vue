@@ -102,14 +102,15 @@ export default {
     }
   },
   methods: {
-    ...mapGetters(["getToken"]),
+    ...mapGetters(["getToken", "getSearchTerm"]),
     pagination() {
       this.getResults();
     },
     capitalizeFirstLetter(string) {
       return string.charAt(0).toUpperCase() + string.slice(1);
     },
-    getResults() {
+    getResults(searchTerm) {
+      if(searchTerm == undefined) searchTerm = ""
       let token = this.getToken();
       let pathName = window.location.pathname.split("/");
       let category = "";
@@ -124,7 +125,7 @@ export default {
           "http://localhost:8000/api/model/?category=" +
             category +
             "&page=" +
-            this.page,
+            this.page + "&search=" + searchTerm,
           {
             method: "GET",
             headers: {
@@ -144,7 +145,7 @@ export default {
           "http://localhost:8000/api/texture/?category=" +
             category +
             "&page=" +
-            this.page,
+            this.page + "&search=" + searchTerm,
           {
             method: "GET",
             headers: {
@@ -165,11 +166,21 @@ export default {
   created: function () {
     this.getResults();
   },
+  computed: {
+    searchTerm () {
+      return this.getSearchTerm();
+      
+    }
+  },
   watch: {
     $route(to, from) {
       console.log(to.params.category, from);
       this.getResults();
     },
+    searchTerm(to, from) {
+      console.log(to, from)
+      this.getResults(to);
+    }
   },
 };
 </script>
