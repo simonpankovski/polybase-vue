@@ -3,14 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "serve": "vue-cli-service serve",
+    "start": "node server.js"
   },
   "dependencies": {
     "@stripe/stripe-js": "^1.23.0",
     "@vue-stripe/vue-stripe": "^4.4.1",
     "core-js": "^3.6.5",
+    "express": "^4.17.3",
+    "serve-static": "^1.15.0",
     "three": "^0.136.0",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",
