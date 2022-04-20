@@ -218,8 +218,6 @@ export default {
   computed: {
     count() {
       return this.getCart();
-      // Or return basket.getters.fruitsCount
-      // (depends on your design decisions).
     },
     width() {
       return this.windowWidth;
@@ -276,17 +274,7 @@ export default {
     cursor: pointer;
   }
 }
-#login {
-  border: 1px solid orange;
-  border-top-left-radius: 5px;
-  border-bottom-left-radius: 5px;
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
-  transition: 0.3s;
-  &:hover {
-    border: 1px solid rgb(246, 225, 186);
-  }
-}
+
 #register {
   background: orange;
   border-top-left-radius: 5px;

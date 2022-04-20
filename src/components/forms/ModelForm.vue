@@ -1,111 +1,119 @@
 <template>
   <v-card color="grey darken-4">
-    <v-container>
-    <v-form
-      ref="form"
-      v-model="valid"
-      lazy-validation
-      @submit.prevent="handleSubmit"
-    >
-      <v-text-field
-        v-model="title"
-        :rules="rules"
-        counter="50"
-        name="name"
-        label="Model Name"
-        dark
-      ></v-text-field>
-      <v-card flat color="transparent">
-        <v-subheader class="white--text">Price in EUR</v-subheader>
+    <v-container class="px-10">
+      <v-form
+        ref="form"
+        v-model="valid"
+        lazy-validation
+        @submit.prevent="handleSubmit"
+      >
+        <v-text-field
+          v-model="title"
+          :rules="rules"
+          counter="50"
+          name="name"
+          label="Model Name"
+          dark
+        ></v-text-field>
+        <v-card flat color="transparent">
+          <v-subheader class="white--text px-0">Price in EUR</v-subheader>
+          <v-card-text class="mt-0 pa-0">
+            <v-row>
+              <v-col class="mt-0 pt-0">
+                <v-slider
+                  v-model="slider"
+                  class="align-center"
+                  :max="max"
+                  :min="min"
+                  hide-details
+                  dark
+                >
+                  <template v-slot:append>
+                    <v-text-field
+                      dark
+                      v-model="slider"
+                      name="price"
+                      class="mt-0 pt-0"
+                      hide-details
+                      single-line
+                      type="number"
+                      style="width: 60px"
+                    ></v-text-field>
+                  </template>
+                </v-slider>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+        <v-file-input
+          small-chips
+          dark
+          multiple
+          counter
+          required
+          v-model="thumbnails"
+          :rules="thumbnailRules"
+          name="thumbnails"
+          accept="image/*"
+          label="Upload thumbnails"
+        ></v-file-input>
+        <v-file-input
+          dark
+          small-chips
+          multiple
+          counter
+          :rules="fileRules"
+          name="format"
+          v-model="format"
+          required
+          label="Import model and textures"
+        ></v-file-input>
+        <v-combobox
+          dark
+          v-model="tags"
+          :items="items"
+          label="Tags"
+          name="tags"
+          multiple
+          chips
+        ></v-combobox>
+        <v-select
+          dark
+          :items="categories"
+          label="Category"
+          v-model="category"
+          :rules="categoryRules"
+          name="category"
+          required
+        ></v-select>
+        <div class="text-center">
+          <v-btn
+            color="rgb(104 250 220 / 65%)"
+            class="white--text my-5"
+            type="submit"
+          >
+            Submit
+          </v-btn>
 
-        <v-card-text>
-          <v-row>
-            <v-col>
-              <v-slider
-                v-model="slider"
-                class="align-center"
-                :max="max"
-                :min="min"
-                hide-details
-                dark
-              >
-                <template v-slot:append>
-                  <v-text-field
-                    dark
-                    v-model="slider"
-                    name="price"
-                    class="mt-0 pt-0"
-                    hide-details
-                    single-line
-                    type="number"
-                    style="width: 60px"
-                  ></v-text-field>
-                </template>
-              </v-slider>
-            </v-col>
-          </v-row>
-        </v-card-text>
-      </v-card>
-      <v-file-input
-        small-chips
-        dark
-        multiple
-        counter
-        required
-        v-model="thumbnails"
-        :rules="thumbnailRules"
-        name="thumbnails"
-        accept="image/*"
-        label="Upload thumbnails"
-      ></v-file-input>
-      <v-file-input
-        dark
-        small-chips
-        multiple
-        counter
-        :rules="fileRules"
-        name="format"
-        v-model="format"
-        required
-        label="Import model and textures"
-      ></v-file-input>
-      <v-combobox
-        dark
-        v-model="tags"
-        :items="items"
-        label="Tags"
-        name="tags"
-        multiple
-        chips
-      ></v-combobox>
-      <v-select
-        dark
-        :items="categories"
-        label="Category"
-        v-model="category"
-        :rules="categoryRules"
-        name="category"
-        required
-      ></v-select>
-      <div class="text-center">
-        <v-btn color="deep-orange accent-2" class="white--text" type="submit">
-          Submit
-        </v-btn>
+          <v-overlay :value="overlay">
+            <v-snackbar v-model="snackbar" :timeout="100000">
+              {{ text }}
 
-        <v-overlay :value="overlay">
-          <v-snackbar v-model="snackbar" :timeout="100000">
-            {{ text }}
-
-            <template v-slot:action="{ attrs }">
-              <v-btn color="pink" text v-bind="attrs" @click="snackbar = false">
-                Close
-              </v-btn>
-            </template>
-          </v-snackbar>
-          <v-progress-circular indeterminate size="64"></v-progress-circular>
-        </v-overlay>
-      </div>
-    </v-form>
+              <template v-slot:action="{ attrs }">
+                <v-btn
+                  color="pink"
+                  text
+                  v-bind="attrs"
+                  @click="snackbar = false"
+                >
+                  Close
+                </v-btn>
+              </template>
+            </v-snackbar>
+            <v-progress-circular indeterminate size="64"></v-progress-circular>
+          </v-overlay>
+        </div>
+      </v-form>
     </v-container>
   </v-card>
 </template>
@@ -192,8 +200,8 @@ export default {
             this.text = res.message;
             if (res.code == 400) {
               setTimeout(() => {
-                this.$router.push("/sell");
-              }, 2000);
+                this.overlay = false;
+              }, 3000);
             }
             if (res.code == 200) {
               setTimeout(() => {
@@ -225,5 +233,8 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss" scoped>
+.v-input {
+  margin-top: 15px;
+}
 </style>

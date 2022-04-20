@@ -69,7 +69,7 @@ export default {
           sortable: false,
           value: "name",
         },
-        { text: "Price in $", sortable: true, value: "price" },
+        { text: "Price in €", sortable: true, value: "price" },
         { text: "Type", value: "type" },
         { text: "Download", value: "download" },
         { text: "Rating", value: "rating" },

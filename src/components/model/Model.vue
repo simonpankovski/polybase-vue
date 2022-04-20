@@ -20,7 +20,7 @@
         v-for="(item, i) in this.modelData.thumbnailLinks"
         :key="i"
       >
-        <v-img :src="item" height="300" width="500"></v-img>
+        <v-img :src="item" height="300"></v-img>
       </v-carousel-item>
     </v-carousel>
 
@@ -52,7 +52,7 @@
         column
       >
         <v-chip
-          color="rgb(241, 171, 87)"
+          color="rgb(48 48 48)"
           v-for="tag in this.modelData.tags"
           :key="tag"
           ><span class="white--text">{{ tag }}</span></v-chip
@@ -65,7 +65,7 @@
         <v-icon large color="white"> mdi-cart </v-icon>
       </v-btn>
       <v-btn
-        color="orange"
+        color="rgb(104 250 220 / 65%)"
         class="white--text"
         v-if="displayDownloadButton"
         @click="downloadModel"
@@ -74,7 +74,7 @@
       </v-btn>
       <v-overlay :z-index="zIndex" :value="overlay" class="fullHeight">
         <v-card elevation="2">
-          <v-container  id="container" class="height">
+          <v-container id="container" class="height">
             <div class="d-flex justify-space-between" style="padding-top: 10px">
               <v-snackbar class="mt-16" top v-model="snackbar">
                 {{ text }}
@@ -98,7 +98,7 @@
                 <v-icon large color="white"> mdi-close </v-icon>
               </v-btn>
               <v-btn
-                color="orange"
+                color="rgb(104 250 220 / 65%)"
                 class="white--text"
                 @click="downloadModel"
                 v-if="displayDownloadButton"
@@ -114,7 +114,7 @@
                 <v-icon large color="white"> mdi-cart </v-icon>
               </v-btn>
             </div>
-            <v-row class="mt-16" style="height: 50vh;">
+            <v-row class="mt-6" style="height: 80vh">
               <v-col sm="12" md="6">
                 <v-carousel
                   :continuous="true"
@@ -132,19 +132,59 @@
                     <v-img :src="item" max-height="300" max-width="400"></v-img>
                   </v-carousel-item>
                 </v-carousel>
-                <div class="mt-10 ml-5">
-                  <h1>{{ this.modelData.name }}</h1>
-                  <h4 class="mt-5">{{ this.modelData.price }} $</h4>
-                </div>
+                <v-simple-table class="mt-10 ml-5 bg-color">
+                  <template v-slot:default>
+                    <tbody>
+                      <tr>
+                        <td>Model Name</td>
+                        <td>
+                          <h3>{{ modelData.name }}</h3>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Price</td>
+                        <td>{{ modelData.price }}€</td>
+                      </tr>
+                      <tr>
+                        <td>Created</td>
+                        <td>{{ dateTime }}</td>
+                      </tr>
+                      <tr>
+                        <td>Owner Email</td>
+                        <td>{{ modelData.ownerEmail }}</td>
+                      </tr>
+                      <tr>
+                        <td>Rating</td>
+                        <td>{{ modelData.rating }}/ 5</td>
+                      </tr>
+                      <tr v-if="isModel">
+                        <td>Supported Formats</td>
+                        <td v-for="tag in modelData.tags" :key="tag">
+                          <v-chip
+                            class="ma-2"
+                            color="pink"
+                            label
+                            text-color="white"
+                          >
+                            <v-icon left> mdi-label </v-icon>
+                            {{tag}}
+                          </v-chip>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </template>
+                </v-simple-table>
               </v-col>
               <v-col sm="12" md="6" lg="6">
                 <model-object
                   :model-id="this.modelData.id"
+                  :model-data="this.modelData"
                   v-if="this.isModel"
                 ></model-object>
                 <texture
                   :model-id="this.modelData.id"
                   :category="this.modelData.category"
+                  :model-data="this.modelData"
                   v-else
                 ></texture>
               </v-col>
@@ -178,6 +218,7 @@ export default {
     colors: [],
     cycle: true,
     user: "",
+    dateTime: "",
   }),
   props: ["modelData", "isModel"],
   methods: {
@@ -189,11 +230,11 @@ export default {
       return JSON.parse(payload.toString());
     },
     downloadModel: function () {
-      console.log(this.modelData.id)
+      console.log(this.modelData.id);
       let type = this.isModel ? "model" : "texture";
       let jwt = "Bearer " + this.getToken();
-      
-      fetch("http://localhost:8000/api/"+ type + "/" + this.modelData.id, {
+
+      fetch("http://localhost:8000/api/" + type + "/" + this.modelData.id, {
         method: "GET",
         mode: "cors",
         headers: {
@@ -242,6 +283,8 @@ export default {
     },
   },
   created: function () {
+    let createdOn = this.modelData.createdOn.split("T");
+    this.dateTime = createdOn[0] + " " + createdOn[1].split("+")[0];
     this.user = this.parseJwt(this.getToken()).username;
     this.rating = this.modelData.rating;
     this.users = this.modelData.purchaseCount;
@@ -255,10 +298,18 @@ export default {
   width: 100vw;
 }
 .height {
-  height: 80vh;
+  height: 90vh;
   width: 80vw;
+  padding: 0px 3%;
 }
 #container {
   overflow-y: visible;
+}
+.bg-color {
+  padding: 20px;
+  background: #333333;
+}
+.v-overlay--active {
+  backdrop-filter: blur(5px) !important;
 }
 </style>

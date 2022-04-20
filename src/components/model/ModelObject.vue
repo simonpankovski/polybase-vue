@@ -1,6 +1,26 @@
 <template>
   <div class="heightHundred">
     <div id="canvas" class="heightHundred"></div>
+    <div class="mt-5 ">
+      <v-simple-table class="bg-color">
+        <template v-slot:default>
+          <tbody>
+            <tr>
+              <td>Model Size</td>
+              <td>{{ modelSize }} MB</td>
+            </tr>
+            <tr>
+              <td>Texture Sizes</td>
+              <td>{{ textureSizes }} MB</td>
+            </tr>
+            <tr>
+              <td>Total Size (Uncompressed)</td>
+              <td>{{ modelSize + textureSizes }} MB</td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
+    </div>
   </div>
 </template>
 
@@ -30,6 +50,8 @@ export default {
       isGlass: false,
       isMetal: false,
       hdr: require("@/assets/studio_country_hall_1k.hdr"),
+      modelSize: 0,
+      textureSizes: 0,
     };
   },
   props: ["modelData", "modelId"],
@@ -59,12 +81,23 @@ export default {
           return res.json();
         })
         .then((blob) => {
-          console.log(blob);
           this.init(blob[0][0].file, blob[0].slice(1), token, blob[1]);
           this.animate();
         });
     },
     init: function (blob, textures) {
+      const modelSize = Buffer.from(blob.substring(blob.indexOf(",") + 1));
+
+      this.modelSize = Math.round((modelSize.length / 1e6 / 1.33) * 100) / 100;
+      let textureSize = 0;
+      textures.forEach((element) => {
+        let currentSize = Buffer.from(
+          element.file.substring(element.file.indexOf(",") + 1)
+        );
+        textureSize += currentSize;
+      });
+      this.textureSizes =
+        Math.round((textureSize.length / 1e6 / 1.33) * 100) / 100;
       let container = document.getElementById("canvas");
       const loader = new FBXLoader();
       this.camera = new Three.PerspectiveCamera(
@@ -131,7 +164,7 @@ export default {
               let envMap = envmapLoader.fromCubemap(hdrMap);
               let en = Three.EquirectangularReflectionMapping;
               self.scene.background = envMap.texture;
-              console.log(self.isMetal + " " + self.isGlass);
+
               const material = new Three.MeshPhysicalMaterial({
                 map: colorMap,
                 envMap: en,
@@ -141,7 +174,7 @@ export default {
                 aoMap,
                 opacity: 1,
               });
-              console.log(material);
+
               if (self.isGlass) {
                 material.roughness = 0;
                 material.metalness = 0;
@@ -176,6 +209,7 @@ export default {
     },
   },
   mounted() {
+    console.log(this.modelData);
     this.clicked();
   },
 };
@@ -188,6 +222,10 @@ export default {
   }
 }
 .heightHundred {
-  height: 100%;
+  height: 80%;
+}
+.bg-color {
+  background: #333333 !important;
+  padding: 20px;
 }
 </style>

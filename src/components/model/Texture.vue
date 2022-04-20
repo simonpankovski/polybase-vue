@@ -1,6 +1,6 @@
 <template>
-  <div class="wrapper">
-    <v-container>
+  <v-card class="wrapper bg-color">
+    <div class="wrapper">
       <v-subheader class="pl-0">
         <h2>Metalness</h2>
       </v-subheader>
@@ -19,11 +19,11 @@
         :thumb-color="'orange'"
         @change="metalnessFunc"
       ></v-slider>
-    </v-container>
-    <div class="wrapper">
-      <div id="canvas"></div>
+      <div class="wrapper">
+        <div id="canvas"></div>
+      </div>
     </div>
-  </div>
+  </v-card>
 </template>
 
 <script>
@@ -44,6 +44,7 @@ export default {
       roughness: 10,
       color: null,
       metalness: 45,
+      ior: 0,
       normal: null,
       disp: null,
       ao: null,
@@ -57,6 +58,7 @@ export default {
       if (this.mesh != null) {
         this.mesh.material.metalness = this.metalness * 0.01;
         this.mesh.material.roughness = this.roughness * 0.01;
+        this.mesh.material.ior = this.ior * 0.01;
       }
 
       this.renderer.render(this.scene, this.camera);
@@ -71,14 +73,17 @@ export default {
     },
     clicked: function () {
       let token = "Bearer " + this.getToken();
-      fetch("http://localhost:8000/api/texture/" + this.modelId + "?browse=true", {
-        method: "GET",
-        mode: "cors",
-        headers: {
-          Authorization: token,
-          "Access-Control-Allow-Origin": "*",
-        },
-      })
+      fetch(
+        "http://localhost:8000/api/texture/" + this.modelId + "?browse=true",
+        {
+          method: "GET",
+          mode: "cors",
+          headers: {
+            Authorization: token,
+            "Access-Control-Allow-Origin": "*",
+          },
+        }
+      )
         .then((res) => {
           return res.json();
         })
@@ -114,7 +119,6 @@ export default {
     init: function () {
       let container = document.getElementById("canvas");
 
-      //const loader = new FBXLoader();
       this.camera = new Three.PerspectiveCamera(
         70,
         container.clientWidth / container.clientHeight,
@@ -124,7 +128,6 @@ export default {
       this.camera.position.z = 12;
       const light = new Three.DirectionalLight(0xffffff, 3);
 
-      // move the light right, up, and towards us
       light.position.set(10, 10, 15);
       this.scene = new Three.Scene();
       this.scene.background = new Three.Color("#575454");
@@ -188,7 +191,6 @@ export default {
   },
   mounted() {
     this.clicked();
-    //this.animate();
   },
 };
 </script>
@@ -198,10 +200,15 @@ export default {
   width: 100% !important;
   height: 100%;
   canvas {
-    width: 80%;
+    width: 70%;
   }
 }
 .wrapper {
   height: 80% !important;
+  
+}
+.bg-color {
+  padding: 20px;
+  background: #333333;
 }
 </style>

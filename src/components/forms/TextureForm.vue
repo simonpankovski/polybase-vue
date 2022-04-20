@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container class="px-10">
     <v-form
       ref="form"
       v-model="valid"
@@ -14,11 +14,11 @@
         label="Texture Name"
       ></v-text-field>
       <v-card flat color="transparent">
-        <v-subheader>Price in EUR</v-subheader>
+        <v-subheader class="px-0">Price in EUR</v-subheader>
 
-        <v-card-text>
+        <v-card-text class="mt-0 pa-0">
           <v-row>
-            <v-col>
+            <v-col class="mt-0 pt-0">
               <v-slider
                 v-model="slider"
                 class="align-center"
@@ -72,7 +72,7 @@
         required
       ></v-select>
       <div class="text-center">
-        <v-btn color="deep-orange accent-2" class="white--text" type="submit">
+        <v-btn color="rgb(104 250 220 / 65%)" class="white--text my-5" type="submit">
           Submit
         </v-btn>
 
@@ -181,5 +181,8 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss" scoped>
+.v-input {
+  margin-top: 15px;
+}
 </style>

@@ -1,9 +1,9 @@
 <template>
   <v-container>
-    <v-card color="grey darken-2">
+    <v-card color="grey lighten-1">
       <v-tabs
         v-model="tab"
-        background-color="deep-orange accent-2"
+        background-color="grey darken-1"
         centered
         dark
         icons-and-text

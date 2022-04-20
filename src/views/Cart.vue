@@ -98,7 +98,7 @@ export default {
           sortable: false,
           value: "name",
         },
-        { text: "Price in $", sortable: true, value: "price" },
+        { text: "Price in €", sortable: true, value: "price" },
         { text: "Type", value: "type" },
         { text: "Remove", value: "remove" },
       ],
