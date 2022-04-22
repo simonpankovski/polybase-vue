@@ -1,7 +1,13 @@
 <template>
   <div class="heightHundred">
+    <v-progress-circular
+      indeterminate
+      color="orange"
+      :size="100"
+      v-if="loading"
+    ></v-progress-circular>
     <div id="canvas" class="heightHundred"></div>
-    <div class="mt-5 ">
+    <div class="mt-5">
       <v-simple-table class="bg-color">
         <template v-slot:default>
           <tbody>
@@ -15,7 +21,7 @@
             </tr>
             <tr>
               <td>Total Size (Uncompressed)</td>
-              <td>{{ modelSize + textureSizes }} MB</td>
+              <td>{{ Math.round((modelSize + textureSizes) * 100) / 100 }} MB</td>
             </tr>
           </tbody>
         </template>
@@ -33,6 +39,7 @@ import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
 export default {
   data() {
     return {
+      loading: true,
       camera: null,
       scene: null,
       renderer: null,
@@ -66,6 +73,7 @@ export default {
     },
     clicked: function () {
       let token = "Bearer " + this.getToken();
+      console.log(token);
       fetch(
         "http://localhost:8000/api/model/" + this.modelId + "?browse=true",
         {
@@ -81,11 +89,29 @@ export default {
           return res.json();
         })
         .then((blob) => {
-          this.init(blob[0][0].file, blob[0].slice(1), token, blob[1]);
-          this.animate();
+          let modelToRender = null;
+          let textures = [];
+          blob[0].forEach((element) => {
+            console.log(element);
+            if (
+              element.headers["content-disposition"][0]
+                .split("=")[1].toLowerCase()
+                .includes(".fbx")
+            ) {
+              modelToRender = element.file;
+            } else {
+              textures.push(element);
+            }
+          });
+
+          if (modelToRender != null) {
+            this.init(modelToRender, textures, token, blob[1]);
+            this.animate();
+          }
         });
     },
     init: function (blob, textures) {
+      this.loading = false;
       const modelSize = Buffer.from(blob.substring(blob.indexOf(",") + 1));
 
       this.modelSize = Math.round((modelSize.length / 1e6 / 1.33) * 100) / 100;
@@ -223,9 +249,15 @@ export default {
 }
 .heightHundred {
   height: 80%;
+  position: relative;
 }
 .bg-color {
   background: #333333 !important;
   padding: 20px;
+}
+.v-progress-circular {
+  position: absolute;
+  top: 30%;
+  left: 40%;
 }
 </style>

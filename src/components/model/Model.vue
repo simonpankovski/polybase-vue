@@ -167,7 +167,7 @@
                             text-color="white"
                           >
                             <v-icon left> mdi-label </v-icon>
-                            {{tag}}
+                            {{ tag }}
                           </v-chip>
                         </td>
                       </tr>
@@ -230,7 +230,6 @@ export default {
       return JSON.parse(payload.toString());
     },
     downloadModel: function () {
-      console.log(this.modelData.id);
       let type = this.isModel ? "model" : "texture";
       let jwt = "Bearer " + this.getToken();
 
@@ -273,6 +272,13 @@ export default {
           if (data.code == 200) {
             this.$store.commit("incrementCart");
           }
+          if (data.code == 401) {
+            this.text = data.message;
+            this.snackbar = true;
+            setTimeout(() => {
+              this.$router.push("/login");
+            }, 3000);
+          }
         });
     },
   },
@@ -285,7 +291,8 @@ export default {
   created: function () {
     let createdOn = this.modelData.createdOn.split("T");
     this.dateTime = createdOn[0] + " " + createdOn[1].split("+")[0];
-    this.user = this.parseJwt(this.getToken()).username;
+    if (this.getToken() != "")
+      this.user = this.parseJwt(this.getToken()).username;
     this.rating = this.modelData.rating;
     this.users = this.modelData.purchaseCount;
   },

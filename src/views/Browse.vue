@@ -56,6 +56,7 @@
             circle
             @input="pagination"
             color="orange"
+            class="mt-10"
           ></v-pagination>
         </div>
       </v-col>
@@ -97,9 +98,9 @@ export default {
     models: [],
   }),
   beforeMount() {
-    if (this.getToken() === "") {
+    /*if (this.getToken() === "") {
       this.$router.push("/login");
-    }
+    }*/
   },
   methods: {
     ...mapGetters(["getToken", "getSearchTerm"]),

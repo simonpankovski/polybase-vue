@@ -1,5 +1,23 @@
 <template>
   <v-container class="mt-10" id="container">
+    <v-snackbar
+      v-model="snackbar"
+      :timeout="timeout"
+      top
+    >
+      {{ text }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          color="blue"
+          text
+          v-bind="attrs"
+          @click="snackbar = false"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
     <v-card color="grey darken-4" class="pa-8">
       <h1 class="white--text">Register</h1>
       <form @submit.prevent="login">
@@ -42,6 +60,9 @@ import { mapMutations } from "vuex";
 export default {
   data: () => {
     return {
+      snackbar: false,
+      text: 'The email address is already registered',
+      timeout: 5000,
       email: "",
       password: "",
       confirmPassword: "",
@@ -98,7 +119,7 @@ export default {
           })
           .then((data) => {
             if (data.token === undefined) {
-              console.log("The email address is already registered!");
+              this.snackbar = true;
             } else {
               this.$store.commit("setToken", data.token);
               this.$router.push("/");

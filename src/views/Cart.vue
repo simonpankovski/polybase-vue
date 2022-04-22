@@ -39,7 +39,7 @@
         <v-icon dark> mdi-close </v-icon>
       </v-btn>
 
-      <v-card elevation="2">
+      <v-card elevation="2" id="checkout">
         <v-card-text>
           <h2>Card Credentials</h2>
         </v-card-text>
@@ -54,23 +54,15 @@
           <v-btn @click="submit" color="orange">Proceed</v-btn>
         </v-card-actions>
       </v-card>
-      <v-snackbar
-      v-model="snackbar"
-      :timeout="timeout"
-    >
-      {{ text }}
+      <v-snackbar v-model="snackbar" :timeout="timeout">
+        {{ text }}
 
-      <template v-slot:action="{ attrs }">
-        <v-btn
-          color="pink"
-          text
-          v-bind="attrs"
-          @click="snackbar = false"
-        >
-          Close
-        </v-btn>
-      </template>
-    </v-snackbar>
+        <template v-slot:action="{ attrs }">
+          <v-btn color="pink" text v-bind="attrs" @click="snackbar = false">
+            Close
+          </v-btn>
+        </template>
+      </v-snackbar>
     </v-overlay>
   </v-container>
 </template>
@@ -104,8 +96,8 @@ export default {
       ],
       items: [],
       snackbar: false,
-      text: `Hello, I'm a snackbar`,
-      timeout: 5000
+      text: `Checkout was successful!`,
+      timeout: 5000,
     };
   },
   beforeMount() {
@@ -139,7 +131,6 @@ export default {
             this.$store.commit("setCart", 0);
             this.items = [];
             this.snackbar = true;
-      
           }
         });
     },
@@ -203,5 +194,12 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+#checkout {
+  padding: 50px;
+  height: 30vh;
+}
+.v-overlay--active {
+  backdrop-filter: blur(5px);
+}
 </style>

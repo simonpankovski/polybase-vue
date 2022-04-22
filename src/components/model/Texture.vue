@@ -2,6 +2,15 @@
   <v-card class="wrapper bg-color">
     <div class="wrapper">
       <v-subheader class="pl-0">
+        <h2>Displacement</h2>
+      </v-subheader>
+      <v-slider
+        v-model="dispScale"
+        thumb-label="always"
+        :thumb-color="'orange'"
+        @change="metalnessFunc"
+      ></v-slider>
+      <v-subheader class="pl-0">
         <h2>Metalness</h2>
       </v-subheader>
       <v-slider
@@ -47,6 +56,7 @@ export default {
       ior: 0,
       normal: null,
       disp: null,
+      dispScale: 10,
       ao: null,
       metal: null,
       rough: null,
@@ -58,6 +68,7 @@ export default {
       if (this.mesh != null) {
         this.mesh.material.metalness = this.metalness * 0.01;
         this.mesh.material.roughness = this.roughness * 0.01;
+        this.mesh.material.displacementScale = this.dispScale * 0.01;
         this.mesh.material.ior = this.ior * 0.01;
       }
 
@@ -150,6 +161,7 @@ export default {
       self.renderer.physicallyCorrectLights = true;
       let roughnessValue = self.roughness * 0.01;
       let metalnessValue = self.metalness * 0.01;
+      let dispValue = self.dispScale * 0.01;
       let envmapLoader = new Three.PMREMGenerator(self.renderer);
       new RGBELoader().load(this.logo, function (hdrMap) {
         let envMap = envmapLoader.fromCubemap(hdrMap);
@@ -161,7 +173,7 @@ export default {
           roughness: roughnessValue,
           aoMap: aoMap,
           displacementMap: displacementMap,
-          displacementScale: 0.1,
+          displacementScale: dispValue,
           //metalnessMap: metalMap,
           metalness: metalnessValue,
           envMap: envMap.texture,
@@ -198,13 +210,11 @@ export default {
 <style scoped lang="scss">
 #canvas {
   width: 100% !important;
-  height: 100%;
-  canvas {
-    width: 70%;
-  }
+  height: 55%;
+ 
 }
 .wrapper {
-  height: 80% !important;
+  height: 100% !important;
   
 }
 .bg-color {
