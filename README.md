@@ -1,5 +1,7 @@
 # polybase-frontend
 
+Frontend code for the 3D model E-commerce shop.
+
 ## Project setup
 ```
 npm install
