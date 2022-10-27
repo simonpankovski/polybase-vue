@@ -2,9 +2,9 @@
 
 Frontend code for the 3D model E-commerce shop.
 
--MaterialUI with Vue + Vuex for handling the UI, user interactivity and state management, respectively.
+-MaterialUI with Vue + Vuex for handling the UI, user interactivity and state management.
 
--Three.js library which I used to display the 3D models onto a canvas element in the DOM, with controls to interact with the object.
+-Three.js library used to display the 3D models onto a canvas element in the DOM, with controls for user interactivity.
 
 # Backend code
 
