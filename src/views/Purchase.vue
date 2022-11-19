@@ -39,7 +39,7 @@
         </tr>
       </template>
     </v-data-table>
-    <v-snackbar v-model="snackbar" :timeout="timeout">
+    <v-snackbar v-model="snackbar" :timeout="timeout" top>
       {{ text }}
 
       <template v-slot:action="{ attrs }">

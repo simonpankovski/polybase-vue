@@ -1,5 +1,13 @@
 <template>
   <v-container>
+    <v-snackbar v-model="snackbar" top>
+      {{ text }}
+      <template v-slot:action="{ attrs }">
+        <v-btn color="pink" text v-bind="attrs" @click="snackbar = false">
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
     <v-data-table
       dark
       :headers="headers"
@@ -27,58 +35,22 @@
       <template v-slot:footer>
         <v-btn
           style="position: absolute; margin: 10px 20px; background: orange"
-          @click="overlay = !overlay"
           :disabled="items.length == 0"
+          @click="tokenCreated"
         >
           Checkout
         </v-btn>
       </template>
     </v-data-table>
-    <v-overlay :z-index="zIndex" :value="overlay" style="width: 100%">
-      <v-btn class="white--text mb-10" @click="overlay = false">
-        <v-icon dark> mdi-close </v-icon>
-      </v-btn>
-
-      <v-card elevation="2" id="checkout">
-        <v-card-text>
-          <h2>Card Credentials</h2>
-        </v-card-text>
-        <stripe-element-card
-          :pk="publishableKey"
-          ref="elementRef"
-          @token="tokenCreated"
-          style="width: 100vh"
-          class="px-2 my-5"
-        ></stripe-element-card>
-        <v-card-actions>
-          <v-btn @click="submit" color="orange">Proceed</v-btn>
-        </v-card-actions>
-      </v-card>
-      <v-snackbar v-model="snackbar" :timeout="timeout">
-        {{ text }}
-
-        <template v-slot:action="{ attrs }">
-          <v-btn color="pink" text v-bind="attrs" @click="snackbar = false">
-            Close
-          </v-btn>
-        </template>
-      </v-snackbar>
-    </v-overlay>
   </v-container>
 </template>
 
 <script>
 import { mapGetters, mapMutations } from "vuex";
-import { StripeElementCard } from "@vue-stripe/vue-stripe";
 export default {
-  components: {
-    StripeElementCard,
-  },
   data() {
     return {
       secret: "",
-      publishableKey:
-        "pk_test_51K4oeOL44p3mSuwWwZwOVo0fiZKoJIdLE5Oj9p0DeBdL9bxABeNir4lfNRYZwfQw8O5C8h0rEETM4iQnmj5Bb8rt00ZeA7zBXB",
       token: null,
       overlay: false,
       zIndex: 0,
@@ -112,7 +84,7 @@ export default {
       // this will trigger the process
       this.$refs.elementRef.submit();
     },
-    tokenCreated(token) {
+    tokenCreated() {
       let jwt = "Bearer " + this.getToken();
       fetch("http://localhost:8000/api/cart/checkout", {
         method: "POST",
@@ -122,7 +94,6 @@ export default {
           "Access-Control-Allow-Origin": "*",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ token: token }),
       })
         .then((res) => res.json())
         .then((data) => {
@@ -201,5 +172,9 @@ export default {
 
 .v-overlay--active {
   backdrop-filter: blur(5px);
+}
+.v-snack__wrapper {
+  position: fixed;
+  top: 0 !important;
 }
 </style>
