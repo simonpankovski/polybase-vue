@@ -106,14 +106,13 @@ export default {
     }
   },
   methods: {
-    ...mapGetters(["getToken"]),
+    ...mapGetters(["getToken", "getCart"]),
     ...mapMutations(["setCart"]),
     submit() {
       // this will trigger the process
       this.$refs.elementRef.submit();
     },
     tokenCreated(token) {
-      console.log(token);
       let jwt = "Bearer " + this.getToken();
       fetch("http://localhost:8000/api/cart/checkout", {
         method: "POST",
@@ -168,8 +167,8 @@ export default {
         }
       )
         .then((res) => res.json())
-        .then((data) => {
-          console.log(data);
+        .then(() => {
+          this.$store.commit("setCart", this.getCart() - 1);
           this.items = this.items.filter((d) => d.id !== item.id);
         });
     },
@@ -199,6 +198,7 @@ export default {
   padding: 50px;
   height: 30vh;
 }
+
 .v-overlay--active {
   backdrop-filter: blur(5px);
 }

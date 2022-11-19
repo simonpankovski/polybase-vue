@@ -1,5 +1,5 @@
 <template>
-  <v-card class="wrapper bg-color">
+  <v-card class="wrapper">
     <div class="wrapper">
       <v-subheader class="pl-0">
         <h2>Displacement</h2>

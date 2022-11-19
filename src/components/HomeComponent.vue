@@ -12,7 +12,6 @@
           ><span>Browse</span></v-btn
         ></router-link
       >
-
     </div>
   </div>
 </template>
@@ -45,7 +44,6 @@ export default {
 <style scoped lang="scss">
 $secondary-color: #fa7268;
 #main {
-  //height: calc(100vh - 64px);
   height: 100vh;
   background-position: center;
   background-size: cover;
@@ -75,5 +73,4 @@ html,
 body {
   overflow-y: hidden !important;
 }
-
 </style>

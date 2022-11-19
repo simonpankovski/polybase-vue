@@ -1,5 +1,5 @@
 <template>
-  <v-card :loading="loading" max-width="374" dark>
+  <v-card :loading="loading" max-width="400" dark>
     <template slot="progress">
       <v-progress-linear
         color="deep-purple"
@@ -14,7 +14,7 @@
       :show-arrows="true"
       hide-delimiter-background
       delimiter-icon="mdi-minus"
-      height="300"
+      height="auto"
     >
       <v-carousel-item
         v-for="(item, i) in this.modelData.thumbnailLinks"
@@ -26,26 +26,31 @@
 
     <v-card-title>{{ this.modelData.name }}</v-card-title>
 
-    <v-card-text>
-      <v-row align="center" class="mx-0">
-        <v-rating
-          :value="this.rating"
-          color="amber"
-          dense
-          half-increments
-          readonly
-          size="14"
-        ></v-rating>
+    <v-card-text class="d-flex" align="center">
+      <v-row align="center" class="m-0 justify-space-between">
+        <div class="d-flex flex-row">
+          <v-rating
+            :value="this.rating"
+            background-color="white"
+            color="amber"
+            dense
+            half-increments
+            readonly
+            size="14"
+            class="mr-2"
+          ></v-rating>
 
-        <div class="grey--text ms-4">{{ this.rating }} ({{ this.users }})</div>
+          <div class="grey--text">{{ this.rating }} ({{ this.users }})</div>
+        </div>
+        <div>
+          <div class="text-subtitle-1">${{ this.modelData.price }}</div>
+        </div>
       </v-row>
-
-      <div class="my-4 text-subtitle-1">${{ this.modelData.price }}</div>
     </v-card-text>
 
     <v-divider class="mx-4"></v-divider>
 
-    <v-card-text>
+    <v-card-text v-if="this.modelData.tags" class="py-2">
       <v-chip-group
         v-model="selection"
         active-class="deep-purple accent-4 white--text"
@@ -60,22 +65,36 @@
       </v-chip-group>
     </v-card-text>
 
-    <v-card-actions class="justify-space-between">
-      <v-btn color="orange" @click="overlay = !overlay">
-        <v-icon large color="white"> mdi-cart </v-icon>
-      </v-btn>
+    <v-card-actions class="justify-space-between px-4 py-4">
       <v-btn
+        class="rounded-0"
+        outlined
+        color="orange"
+        @click="overlay = !overlay"
+      >
+        <v-icon small color="orange"> mdi-cart </v-icon>
+      </v-btn>
+      <!-- color="rgb(104 250 220 / 65%)" class="white--text" -->
+      <v-btn
+        class="rounded-circle"
+        fab
+        outlined
+        small
         color="rgb(104 250 220 / 65%)"
-        class="white--text"
         v-if="displayDownloadButton"
         @click="downloadModel"
       >
-        <v-icon large color="white"> mdi-cloud-download-outline</v-icon>
+        <v-icon small color="rgb(104 250 220 / 65%)">
+          mdi-cloud-download-outline</v-icon
+        >
       </v-btn>
-      <v-overlay :z-index="zIndex" :value="overlay" class="fullHeight">
-        <v-card elevation="2">
-          <v-container id="container" class="height">
-            <div class="d-flex justify-space-between" style="padding-top: 10px">
+      <v-overlay :z-index="zIndex" :value="overlay">
+        <v-card elevation="2" class="overlay">
+          <v-container id="container">
+            <div
+              class="d-flex justify-space-between px-3"
+              style="padding-top: 10px"
+            >
               <v-snackbar class="mt-16" top v-model="snackbar">
                 {{ text }}
 
@@ -91,30 +110,36 @@
                 </template>
               </v-snackbar>
               <v-btn
-                class="white--text"
-                color="transparent"
+                class="white--text rounded-0"
+                color="white"
+                outlined
                 @click="overlay = false"
               >
-                <v-icon large color="white"> mdi-close </v-icon>
+                <v-icon medium color="white"> mdi-close </v-icon>
               </v-btn>
               <v-btn
+                fab
+                outlined
+                small
                 color="rgb(104 250 220 / 65%)"
-                class="white--text"
                 @click="downloadModel"
                 v-if="displayDownloadButton"
               >
-                <v-icon large color="white"> mdi-cloud-download-outline</v-icon>
+                <v-icon small color="rgb(104 250 220 / 65%)">
+                  mdi-cloud-download-outline</v-icon
+                >
               </v-btn>
               <v-btn
                 v-else
-                class="white--text"
-                color="deep-orange accent-2"
+                class="rounded-0"
+                outlined
+                color="orange"
                 @click="addToCart"
               >
-                <v-icon large color="white"> mdi-cart </v-icon>
+                <v-icon small color="orange"> mdi-cart </v-icon>
               </v-btn>
             </div>
-            <v-row class="mt-6" style="height: 80vh">
+            <v-row class="mt-6">
               <v-col sm="12" md="6">
                 <v-carousel
                   :continuous="true"
@@ -129,10 +154,10 @@
                     v-for="(item, i) in this.modelData.thumbnailLinks"
                     :key="i"
                   >
-                    <v-img :src="item" max-height="300" max-width="400"></v-img>
+                    <v-img :src="item" max-height="300" width="400"></v-img>
                   </v-carousel-item>
                 </v-carousel>
-                <v-simple-table class="mt-10 ml-5 bg-color">
+                <v-simple-table class="mt-10 bg-color">
                   <template v-slot:default>
                     <tbody>
                       <tr>
@@ -180,7 +205,8 @@
                   :model-id="this.modelData.id"
                   :model-data="this.modelData"
                   v-if="this.isModel"
-                ></model-object>
+                >
+                </model-object>
                 <texture
                   :model-id="this.modelData.id"
                   :category="this.modelData.category"
@@ -282,10 +308,18 @@ export default {
         });
     },
   },
+  watch: {
+    overlayValue(newVal, oldVal) {
+      console.log(newVal, oldVal, "overlay");
+    },
+  },
   computed: {
     displayDownloadButton: function () {
       // `this` points to the vm instance
       return this.modelData.purchases.includes(this.user);
+    },
+    overlayValue() {
+      return this.overlay;
     },
   },
   created: function () {
@@ -300,22 +334,23 @@ export default {
 </script>
 
 <style scoped>
-.fullHeight {
-  height: 100vh;
-  width: 100vw;
+.overlay {
+  overflow-y: auto;
+  height: 85vh;
 }
-.height {
-  height: 90vh;
-  width: 80vw;
-  padding: 0px 3%;
+.row {
+  margin: 0 !important;
 }
+
 #container {
   overflow-y: visible;
 }
+
 .bg-color {
   padding: 20px;
   background: #333333;
 }
+
 .v-overlay--active {
   backdrop-filter: blur(5px) !important;
 }
