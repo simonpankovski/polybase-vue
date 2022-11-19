@@ -10,7 +10,8 @@
           v-model="email"
           name="username"
           dark
-        ></v-text-field>
+        >
+        </v-text-field>
         <v-text-field
           label="Password"
           :rules="passwordRules"
@@ -106,7 +107,9 @@ export default {
 #container {
   width: 50%;
 }
+
 #password-link {
   text-decoration: none;
+  color: white;
 }
 </style>

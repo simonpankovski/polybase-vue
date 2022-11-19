@@ -7,7 +7,7 @@ export default new Vuex.Store({
   state: {
     token: null,
     cart: 0,
-    searchTerm: ""
+    searchTerm: "",
   },
   mutations: {
     setToken(state, token) {
@@ -16,7 +16,8 @@ export default new Vuex.Store({
     },
     removeToken(state) {
       state.token = null;
-      document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie =
+        "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     },
     incrementCart(state) {
       state.cart++;
@@ -42,18 +43,17 @@ export default new Vuex.Store({
       return state.searchTerm;
     },
   },
-  actions: {
-  },
+  actions: {},
   modules: {},
 });
 
 function getCookie(cname) {
   let name = cname + "=";
   let decodedCookie = decodeURIComponent(document.cookie);
-  let ca = decodedCookie.split(';');
-  for(let i = 0; i <ca.length; i++) {
+  let ca = decodedCookie.split(";");
+  for (let i = 0; i < ca.length; i++) {
     let c = ca[i];
-    while (c.charAt(0) == ' ') {
+    while (c.charAt(0) == " ") {
       c = c.substring(1);
     }
     if (c.indexOf(name) == 0) {
@@ -65,7 +65,7 @@ function getCookie(cname) {
 function setCookie(cname, cvalue, exdays) {
   document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   const d = new Date();
-  d.setTime(d.getTime() + (exdays*24*60*60*1000));
-  let expires = "expires="+ d.toUTCString();
+  d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
+  let expires = "expires=" + d.toUTCString();
   document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
