@@ -8,7 +8,12 @@
               name="txtName"
               id="search"
               class="v-list-item relative"
-              @input="debouncedSearch"
+              @input="
+                () => {
+                  this.isLoading = true;
+                  debouncedSearch();
+                }
+              "
               v-model="searchText"
             />
             <v-icon id="magnify" dark> mdi-magnify </v-icon>
@@ -45,21 +50,14 @@
           </v-list>
         </v-card>
       </v-col>
-      <v-col class="mt-5">
+      <v-col class="mt-5 mb-16">
         <v-row class="mx-0" v-if="!isLoading">
-          <v-col
-            cols="12"
-            sm="6"
-            md="6"
-            lg="4"
-            v-for="model in models"
-            :key="model.id"
-          >
+          <v-col sm="6" md="6" lg="3" v-for="model in models" :key="model.id">
             <model :model-data="model" :is-model="isModel"></model>
           </v-col>
         </v-row>
         <v-row class="mx-0" v-else>
-          <v-col v-for="n in 6" :key="n" cols="12" sm="6" md="6" lg="4">
+          <v-col v-for="n in 6" :key="n" cols="12" sm="6" md="6" lg="3">
             <skeleton-card />
           </v-col>
         </v-row>
@@ -71,7 +69,6 @@
             circle
             @input="pagination"
             color="orange"
-            class="mt-10"
           >
           </v-pagination>
         </div>
@@ -143,12 +140,12 @@ export default {
     search() {
       this.$store.commit("setSearchTerm", this.searchText);
     },
-    getResults(searchTerm) {
-      if (searchTerm == undefined) searchTerm = "";
+    getResults() {
       let token = this.getToken();
       let pathName = window.location.pathname.split("/");
       let category = "";
       let type = "";
+      let searchTerm = this.searchText;
       if (pathName.length > 2) {
         category = this.capitalizeFirstLetter(pathName[pathName.length - 1]);
         type = this.capitalizeFirstLetter(pathName[pathName.length - 2]);
@@ -231,7 +228,6 @@ export default {
   right: 20px;
   top: 20%;
   position: absolute;
-  z-index: 2;
 }
 #search {
   width: 100%;
@@ -251,9 +247,9 @@ export default {
 }
 .pagination {
   position: absolute;
+  bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
-  bottom: 30px;
 }
 
 .no-style {

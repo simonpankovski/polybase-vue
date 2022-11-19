@@ -33,9 +33,6 @@
                 mdi-toy-brick-search
               </v-icon>
             </router-link>
-            <router-link to="/sell" class="pr-4">
-              <v-icon class="nav-icon" dark> mdi-cloud-upload </v-icon>
-            </router-link>
             <router-link to="/cart" class="pr-4 relative">
               <v-icon class="nav-icon" dark> mdi-cart </v-icon
               ><span id="cartCount" v-if="cartCount > 0">{{
@@ -88,14 +85,11 @@
         </div>
       </template>
       <template v-else>
-        <div class="d-flex flex-column">
+        <div class="d-flex flex-column nav-links">
           <router-link to="/browse/models/all" class="text-center mt-5">
             <v-icon class="nav-icon" dark> mdi-toy-brick-search </v-icon>
           </router-link>
-          <router-link to="/sell" class="text-center mt-5">
-            <v-icon class="nav-icon" dark> mdi-cloud-upload </v-icon>
-          </router-link>
-          <router-link to="/cart" class="text-center mt-5">
+          <router-link to="/cart" class="text-center mt-5 cart-link">
             <v-icon class="nav-icon" dark> mdi-cart </v-icon
             ><span id="cartCount" v-if="cartCount > 0">{{
               this.cartCount
@@ -216,7 +210,7 @@ export default {
 
 <style scoped lang="scss">
 .relative {
-  position: relative!important;
+  position: relative !important;
 }
 .nav-icon:hover {
   color: orange;
@@ -252,14 +246,24 @@ export default {
     background: rgb(255, 190, 68);
   }
 }
-
+.nav-links {
+  justify-content: center !important;
+  & a {
+    margin: 0 auto;
+    width: 24% !important;
+  }
+}
+.cart-link {
+  position: relative;
+}
 #cartCount {
   position: absolute;
   top: -9px;
   right: 8px;
   background: #333333;
-  border: 1px solid rgba(104, 250, 220, 0.65);
-  color: rgba(104, 250, 220, 0.65);
+  border: 1px solid rgb(104, 250, 220);
+  background-color: rgb(104, 250, 220);
+  color: white;
   border-radius: 50%;
   font-size: 12px;
   padding: 2px;

@@ -234,9 +234,10 @@ export default {
           object.attributes.uv2 = object.attributes.uv;
         }
         self.gui = new GUI();
-        self.gui.domElement.style.top = "10vh";
-        self.gui.domElement.style.left = "50%";
-        self.gui.domElement.style.transform = "translateX(-50%)";
+
+        self.gui.domElement.style.top = "14.8vh";
+        self.gui.domElement.style.left = "51%";
+        // self.gui.domElement.style.transform = "translateX(-50%)";
         const lightFolder = self.gui.addFolder("Light");
         lightFolder
           .add(self.params, "lightIntensity", 0, 10, 0.01)
@@ -310,7 +311,7 @@ export default {
             });
         });
 
-        self.gui.open();
+        //self.gui.open();
         self.scene.add(object, light);
         self.mesh = object;
       });
