@@ -1,16 +1,11 @@
-FROM node:16.13.0-alpine
-
-# Transfering files and moving workdir
-COPY . /srv/app
-WORKDIR /srv/app
-
-# Building project
+FROM node:16.13.0-alpine as build
+WORKDIR /app
+COPY package*.json ./
 RUN npm install
+COPY . .
 RUN npm run build
 
-# Changing permissions
-RUN chown -R node:node .
-USER node
-
-
-CMD ["vue-cli-service", "serve","--host=0.0.0.0","--port=8080"]
+FROM nginx:stable-alpine as production
+COPY --from=build /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
