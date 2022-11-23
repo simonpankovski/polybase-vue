@@ -1,6 +1,6 @@
 <template>
-  <div style="z-index: 2">
-    <v-app-bar color="grey darken-4" class="px-7">
+  <div class="nav-bar">
+    <v-app-bar fixed color="grey darken-4" class="px-7">
       <router-link to="/" class="d-flex align-center white--text">
         <v-img
           class="mr-2"
@@ -270,5 +270,12 @@ export default {
   text-align: center;
   width: 22px;
   height: 22px;
+}
+.nav-bar {
+  z-index: 2;
+  width: 100%;
+}
+.v-toolbar__content {
+  padding: 0 !important;
 }
 </style>

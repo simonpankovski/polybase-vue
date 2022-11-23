@@ -40,7 +40,9 @@
             class="mr-2"
           ></v-rating>
 
-          <div class="grey--text">{{ this.rating }} ({{ this.users }})</div>
+          <div class="grey--text">
+            {{ this.rating.toFixed(1) }} ({{ this.users }})
+          </div>
         </div>
         <div>
           <div class="text-subtitle-1">${{ this.modelData.price }}</div>
@@ -76,10 +78,10 @@
       </v-btn>
       <!-- color="rgb(104 250 220 / 65%)" class="white--text" -->
       <v-btn
-        class="rounded-circle"
+        class="rounded-circle rainbow"
         fab
         outlined
-        small
+        x-small
         color="rgb(104 250 220 / 65%)"
         v-if="displayDownloadButton"
         @click="downloadModel"
@@ -144,7 +146,6 @@
                 <v-carousel
                   :continuous="true"
                   :cycle="this.cycle"
-                  :show-arrows="true"
                   hide-delimiter-background
                   delimiter-icon="mdi-minus"
                   height="300"
@@ -154,10 +155,10 @@
                     v-for="(item, i) in this.modelData.thumbnailLinks"
                     :key="i"
                   >
-                    <v-img :src="item" max-height="300" width="400"></v-img>
+                    <v-img :src="item" max-height="300" max-width="550"></v-img>
                   </v-carousel-item>
                 </v-carousel>
-                <v-simple-table class="mt-10 bg-color">
+                <v-simple-table class="mt-10 bg-color" id="data-table">
                   <template v-slot:default>
                     <tbody>
                       <tr>
@@ -180,7 +181,7 @@
                       </tr>
                       <tr>
                         <td>Rating</td>
-                        <td>{{ modelData.rating }}/ 5</td>
+                        <td>{{ modelData.rating.toFixed(1) }} / 5</td>
                       </tr>
                       <tr v-if="isModel">
                         <td>Supported Formats</td>
@@ -299,11 +300,20 @@ export default {
             this.$store.commit("incrementCart");
           }
           if (data.code == 401) {
-            this.text = data.message;
+            this.text = "Redirecting to login page in 3 seconds!";
             this.snackbar = true;
-            setTimeout(() => {
-              this.$router.push("/login");
-            }, 3000);
+            const self = this;
+            let counter = 4;
+            let myInterval = setInterval(function () {
+              if (counter === 0) {
+                self.text = "";
+                clearInterval(myInterval);
+                self.$router.push("/login");
+              } else {
+                self.text =
+                  "Redirecting to login page in " + --counter + " seconds!";
+              }
+            }, 1000);
           }
         });
     },
@@ -333,10 +343,14 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+#data-table {
+  margin: 0 auto;
+}
 .overlay {
   overflow-y: auto;
-  height: 85vh;
+  height: auto;
+  padding: 0;
 }
 .row {
   margin: 0 !important;

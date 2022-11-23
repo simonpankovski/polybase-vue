@@ -1,6 +1,6 @@
 <template>
-  <v-container class="mt-10" id="container">
-    <v-card color="grey darken-4" class="pa-8">
+  <v-container class="mt-16" id="container">
+    <v-card color="grey darken-4" class="pa-8" id="login-form">
       <h1 class="white--text">LOGIN</h1>
       <form @submit.prevent="login">
         <v-text-field
@@ -21,18 +21,26 @@
           name="password"
           dark
         ></v-text-field>
-        <p v-if="invalidLogin" class="red--text pt-2">Invalid Credentials</p>
-        <div class="d-flex justify-space-between align-end">
-          <v-btn
-            class="mt-10 orange darken-2 accent-2 white--text"
-            type="submit"
-          >
+
+        <p id="invalid-credentials" v-if="invalidLogin" class="red--text pt-2">
+          Invalid Credentials
+        </p>
+        <div class="d-flex justify-space-between align-end pt-6 form-buttons">
+          <v-btn class="orange darken-2 accent-2 white--text" type="submit">
             submit
           </v-btn>
           <a href="#" id="password-link">Forgot password?</a>
         </div>
       </form>
     </v-card>
+    <v-progress-linear
+      id="progress-bar"
+      color="orange"
+      indeterminate
+      height="6"
+      bottom
+      v-if="loading"
+    ></v-progress-linear>
   </v-container>
 </template>
 <script>
@@ -42,6 +50,7 @@ export default {
   name: "Login",
   data: () => {
     return {
+      loading: false,
       invalidLogin: false,
       email: "",
       password: "",
@@ -77,6 +86,7 @@ export default {
         ) {
           const data = new FormData(e.target);
           const value = Object.fromEntries(data.entries());
+          this.loading = true;
           fetch("http://localhost:8000/api/login_check", {
             method: "POST",
             headers: {
@@ -89,6 +99,7 @@ export default {
               return res.json();
             })
             .then((data) => {
+              this.loading = false;
               if (data.code == 401) {
                 this.invalidLogin = true;
               } else {
@@ -104,12 +115,28 @@ export default {
 };
 </script>
 <style scoped>
-#container {
-  width: 50%;
+#invalid-credentials {
+  margin-bottom: 0;
+}
+#login-form {
+  border-radius: 4px 4px 0 0;
 }
 
 #password-link {
   text-decoration: none;
   color: white;
+}
+#progress-bar {
+  border-radius: 0 0 4px 4px;
+}
+@media screen and (min-width: 600px) {
+  #container {
+    width: 60%;
+  }
+}
+@media screen and (min-width: 1200px) {
+  #container {
+    width: 40%;
+  }
 }
 </style>
