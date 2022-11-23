@@ -13,4 +13,4 @@ RUN chown -R node:node .
 USER node
 
 
-CMD ["npm","run","serve", "--host=0.0.0.0", "--port=8080"]
+CMD ["vue-cli-service", "serve","--host=0.0.0.0","--port=8080"]
