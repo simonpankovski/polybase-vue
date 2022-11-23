@@ -1,24 +1,15 @@
 <template>
-  <v-container class="mt-10" id="container">
-    <v-snackbar
-      v-model="snackbar"
-      :timeout="timeout"
-      top
-    >
+  <v-container class="mt-16" id="container">
+    <v-snackbar v-model="snackbar" :timeout="timeout" top>
       {{ text }}
 
       <template v-slot:action="{ attrs }">
-        <v-btn
-          color="blue"
-          text
-          v-bind="attrs"
-          @click="snackbar = false"
-        >
+        <v-btn color="blue" text v-bind="attrs" @click="snackbar = false">
           Close
         </v-btn>
       </template>
     </v-snackbar>
-    <v-card color="grey darken-4" class="pa-8">
+    <v-card id="register-form" color="grey darken-4" class="pa-8">
       <h1 class="white--text">Register</h1>
       <form @submit.prevent="login">
         <v-text-field
@@ -52,6 +43,14 @@
         </v-btn>
       </form>
     </v-card>
+    <v-progress-linear
+      id="progress-bar"
+      color="orange"
+      indeterminate
+      height="6"
+      bottom
+      v-if="loading"
+    ></v-progress-linear>
   </v-container>
 </template>
 
@@ -60,8 +59,9 @@ import { mapMutations } from "vuex";
 export default {
   data: () => {
     return {
+      loading: false,
       snackbar: false,
-      text: 'The email address is already registered',
+      text: "The email address is already registered",
       timeout: 5000,
       email: "",
       password: "",
@@ -105,6 +105,7 @@ export default {
       ) {
         const data = new FormData(e.target);
         const value = Object.fromEntries(data.entries());
+        this.loading = true;
         fetch("http://localhost:8000/api/register", {
           method: "POST",
           mode: "cors",
@@ -118,6 +119,7 @@ export default {
             return res.json();
           })
           .then((data) => {
+            this.loading = false;
             if (data.token === undefined) {
               this.snackbar = true;
             } else {
@@ -133,7 +135,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#container {
-  width: 50%;
+#progress-bar {
+  border-radius: 0 0 4px 4px;
+}
+#register-form {
+  border-radius: 4px 4px 0 0;
+}
+@media screen and (min-width: 600px) {
+  #container {
+    width: 60%;
+  }
+}
+@media screen and (min-width: 1200px) {
+  #container {
+    width: 40%;
+  }
 }
 </style>

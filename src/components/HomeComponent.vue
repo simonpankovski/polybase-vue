@@ -67,7 +67,12 @@ $secondary-color: #fa7268;
   color: #fbb5b0;
 }
 #container {
-  padding: 15% 40px;
+  padding: 124px 40px 0 40px;
+}
+@media screen and (min-width: 560px) {
+  #container {
+    padding-top: 264px;
+  }
 }
 html,
 body {

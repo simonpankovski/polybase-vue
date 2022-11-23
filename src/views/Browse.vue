@@ -1,6 +1,6 @@
 <template>
   <div id="main">
-    <v-row class="mx-0">
+    <v-row class="mx-0 mt-11">
       <v-col class="px-0" cols="12" sm="3" md="3" lg="2">
         <v-card dark>
           <div class="px-4 relative">
@@ -52,12 +52,19 @@
       </v-col>
       <v-col class="mt-5 mb-16">
         <v-row class="mx-0" v-if="!isLoading">
-          <v-col sm="6" md="6" lg="3" v-for="model in models" :key="model.id">
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+            lg="3"
+            v-for="model in models"
+            :key="model.id"
+          >
             <model :model-data="model" :is-model="isModel"></model>
           </v-col>
         </v-row>
         <v-row class="mx-0" v-else>
-          <v-col v-for="n in 6" :key="n" cols="12" sm="6" md="6" lg="3">
+          <v-col v-for="n in 6" :key="n" cols="12" sm="6" md="4" lg="3">
             <skeleton-card />
           </v-col>
         </v-row>

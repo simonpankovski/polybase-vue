@@ -1,4 +1,4 @@
-FROM node:12-alpine
+FROM node:16.13.0-alpine
 
 # Transfering files and moving workdir
 COPY . /srv/app

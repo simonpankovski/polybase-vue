@@ -1,13 +1,16 @@
 <template>
-  <div class="heightHundred">
+  <div id="wrapper" class="heightHundred">
     <v-progress-circular
       indeterminate
       color="orange"
       :size="100"
       v-if="loading"
     ></v-progress-circular>
-    <div id="canvas" class="heightHundred"></div>
-    <div class="mt-5">
+    <div id="canvasWrapper" class="heightHundred">
+      <div id="canvas"></div>
+    </div>
+
+    <div class="mt-15">
       <v-simple-table>
         <template v-slot:default>
           <tbody>
@@ -129,7 +132,6 @@ export default {
         });
     },
     init: function (blob, textures) {
-      this.loading = false;
       const modelSize = Buffer.from(blob.substring(blob.indexOf(",") + 1));
 
       this.modelSize = Math.round((modelSize.length / 1e6 / 1.33) * 100) / 100;
@@ -233,19 +235,23 @@ export default {
         if (self.aoMap) {
           object.attributes.uv2 = object.attributes.uv;
         }
-        self.gui = new GUI();
-
-        self.gui.domElement.style.top = "14.8vh";
-        self.gui.domElement.style.left = "51%";
-        // self.gui.domElement.style.transform = "translateX(-50%)";
-        const lightFolder = self.gui.addFolder("Light");
+        self.gui = new GUI({
+          container: document.getElementById("canvasWrapper"),
+        });
+        const gui = self.gui;
+        gui.domElement.id = "gui";
+        // console.log(gui)
+        // container.appendChild(gui.domElement)
+        gui.domElement.style.position = "absolute";
+        gui.domElement.style.top = "0";
+        const lightFolder = gui.addFolder("Light");
         lightFolder
           .add(self.params, "lightIntensity", 0, 10, 0.01)
           .onChange(function () {
             light.intensity = self.params.lightIntensity;
           });
         object.children.forEach((element, index) => {
-          const meshFolder = self.gui.addFolder("Mesh " + (index + 1));
+          const meshFolder = gui.addFolder("Mesh " + (index + 1));
 
           meshFolder.addColor(self.params, "color").onChange(function () {
             element.material.color.set(self.params.color);
@@ -311,16 +317,19 @@ export default {
             });
         });
 
-        //self.gui.open();
+        self.gui.close();
         self.scene.add(object, light);
+
         self.mesh = object;
       });
       container.appendChild(this.renderer.domElement);
       this.renderer.render(this.scene, this.camera);
+      this.loading = false;
       this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     },
     animate() {
       let container = document.getElementById("canvas");
+      if (container === null) return;
       this.renderer.setSize(container.clientWidth, container.clientHeight);
       requestAnimationFrame(this.animate);
       this.controls.update();
@@ -347,24 +356,37 @@ export default {
   },
 };
 </script>
-<style scoped lang="scss">
+<style lang="scss">
 #canvas {
   width: 100% !important;
+  height: 100% !important;
+
   canvas {
     width: 80%;
   }
 }
-.heightHundred {
-  height: 80%;
+
+#canvasWrapper {
   position: relative;
 }
+
+.heightHundred {
+  height: 80%;
+}
+
 .bg-color {
   background: #333333 !important;
   padding: 20px;
 }
+
 .v-progress-circular {
   position: absolute;
-  top: 30%;
-  left: 40%;
+  top: 25%;
+  right: 25%;
+}
+
+#gui.root .title {
+  font-size: inherit !important;
+  line-height: 21px !important;
 }
 </style>

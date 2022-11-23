@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container class="mt-16">
     <v-snackbar v-model="snackbar" top>
       {{ text }}
       <template v-slot:action="{ attrs }">
@@ -22,7 +22,7 @@
       <template v-slot:item="row">
         <tr>
           <td>{{ row.item.name }}</td>
-          <td>{{ row.item.price }}</td>
+          <td>{{ row.item.price + " $" }}</td>
           <td>{{ row.item.type }}</td>
           <td>
             <v-btn small @click="onButtonClick(row.item)">
@@ -62,7 +62,7 @@ export default {
           sortable: false,
           value: "name",
         },
-        { text: "Price in €", sortable: true, value: "price" },
+        { text: "Price", sortable: true, value: "price" },
         { text: "Type", value: "type" },
         { text: "Remove", value: "remove" },
       ],
@@ -86,6 +86,7 @@ export default {
     },
     tokenCreated() {
       let jwt = "Bearer " + this.getToken();
+      this.loading = true;
       fetch("http://localhost:8000/api/cart/checkout", {
         method: "POST",
         mode: "cors",
@@ -97,6 +98,7 @@ export default {
       })
         .then((res) => res.json())
         .then((data) => {
+          this.loading = false;
           if (data.code == 200) {
             this.$store.commit("setCart", 0);
             this.items = [];
