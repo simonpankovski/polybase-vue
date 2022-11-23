@@ -1,16 +1,16 @@
 <template>
   <div style="z-index: 2">
     <v-app-bar color="grey darken-4" class="px-7">
-      <router-link to="/" class="d-flex align-center white--text"
-        ><v-img
+      <router-link to="/" class="d-flex align-center white--text">
+        <v-img
           class="mr-2"
           alt="Vuetify Logo"
           contain
           src="../../assets/polybase.png"
           transition="scale-transition"
           width="40"
-        />Polybase</router-link
-      >
+        />Polybase
+      </router-link>
       <v-spacer></v-spacer>
       <v-app-bar-nav-icon
         @click="drawer = true"
@@ -28,40 +28,24 @@
         </template>
         <template v-else>
           <div class="d-flex">
-            <div class="pr-4 relative">
-              <input
-                name="txtName"
-                id="search"
-                @input="search"
-                v-model="searchText"
-              />
-              <v-icon id="magnify" dark> mdi-magnify </v-icon>
-            </div>
             <router-link to="/browse/models/all" class="pr-4">
-              <v-btn color="transparent" dark>
-                <v-icon dark> mdi-toy-brick-search </v-icon>
-              </v-btn>
+              <v-icon class="nav-icon" medium dark>
+                mdi-toy-brick-search
+              </v-icon>
             </router-link>
-            <router-link to="/sell" class="pr-4">
-              <v-btn color="transparent" dark>
-                <v-icon dark> mdi-cloud-upload </v-icon></v-btn
-              ></router-link
-            >
-            <router-link to="/cart" class="pr-4"
-              ><v-btn color="transparent" dark
-                ><v-icon dark> mdi-cart </v-icon
-                ><span id="cartCount" v-if="cartCount > 0">{{
-                  this.cartCount
-                }}</span></v-btn
-              ></router-link
-            >
+            <router-link to="/cart" class="pr-4 relative">
+              <v-icon class="nav-icon" dark> mdi-cart </v-icon
+              ><span id="cartCount" v-if="cartCount > 0">{{
+                this.cartCount
+              }}</span>
+            </router-link>
             <span class="pr-4 link">
               <div class="text-center">
                 <v-menu offset-y>
                   <template v-slot:activator="{ on }">
-                    <v-btn color="transparent" dark v-on="on">
-                      <v-icon dark> mdi-account </v-icon>
-                    </v-btn>
+                    <v-icon class="nav-icon" dark v-on="on">
+                      mdi-account
+                    </v-icon>
                   </template>
                   <v-list>
                     <v-list-item v-for="(item, index) in items" :key="index">
@@ -101,32 +85,21 @@
         </div>
       </template>
       <template v-else>
-        <div class="d-flex flex-column">
+        <div class="d-flex flex-column nav-links">
           <router-link to="/browse/models/all" class="text-center mt-5">
-            <v-btn color="transparent" dark>
-              <v-icon dark> mdi-toy-brick-search </v-icon>
-            </v-btn>
+            <v-icon class="nav-icon" dark> mdi-toy-brick-search </v-icon>
           </router-link>
-          <router-link to="/sell" class="text-center mt-5">
-            <v-btn color="transparent" dark>
-              <v-icon dark> mdi-cloud-upload </v-icon></v-btn
-            ></router-link
-          >
-          <router-link to="/cart" class="text-center mt-5"
-            ><v-btn color="transparent" dark
-              ><v-icon dark> mdi-cart </v-icon
-              ><span id="cartCount" v-if="cartCount > 0">{{
-                this.cartCount
-              }}</span></v-btn
-            ></router-link
-          >
+          <router-link to="/cart" class="text-center mt-5 cart-link">
+            <v-icon class="nav-icon" dark> mdi-cart </v-icon
+            ><span id="cartCount" v-if="cartCount > 0">{{
+              this.cartCount
+            }}</span>
+          </router-link>
           <span class="link">
             <div class="text-center mt-5">
               <v-menu offset-y>
                 <template v-slot:activator="{ on }">
-                  <v-btn color="transparent" dark v-on="on">
-                    <v-icon dark> mdi-account </v-icon>
-                  </v-btn>
+                  <v-icon class="nav-icon" dark v-on="on"> mdi-account </v-icon>
                 </template>
                 <v-list>
                   <v-list-item v-for="(item, index) in items" :key="index">
@@ -157,7 +130,6 @@ export default {
   name: "NavBar",
 
   data: () => ({
-    searchText: "",
     user: "",
     cartCount: 0,
     items: [{ title: "Profile" }, { title: "Purchases" }],
@@ -167,16 +139,9 @@ export default {
   }),
   methods: {
     ...mapGetters(["getToken", "getCart"]),
-    ...mapMutations([
-      "removeToken",
-      "setCart",
-      "setSearchTerm",
-    ]),
+    ...mapMutations(["removeToken", "setCart", "setSearchTerm"]),
     capitalizeFirstLetter(string) {
       return string.charAt(0).toUpperCase() + string.slice(1);
-    },
-    search() {
-      this.$store.commit("setSearchTerm", this.searchText);
     },
     parseJwt(token) {
       var base64Payload = token.split(".")[1];
@@ -188,7 +153,6 @@ export default {
       window.location.reload();
     },
     getCartItemsCount(token) {
-      console.log(token);
       fetch("http://localhost:8000/api/cart/count", {
         method: "GET",
         mode: "cors",
@@ -229,8 +193,8 @@ export default {
   watch: {
     count(newCount, oldCount) {
       // Our fancy notification (2).
+      console.log(newCount, oldCount);
       this.cartCount = newCount;
-      console.log(`We have ${newCount} fruits now, yay! ${oldCount}`);
     },
     width(newWidth, oldWidth) {
       console.log(newWidth, oldWidth);
@@ -246,23 +210,17 @@ export default {
 
 <style scoped lang="scss">
 .relative {
-  position: relative;
-  display: flex;
+  position: relative !important;
 }
-#magnify {
-  right: 20px;
-  top: 20%;
-  position: absolute;
-  z-index: 2;
+.nav-icon:hover {
+  color: orange;
 }
-#search {
-  border-bottom: 1px solid white;
-  color: white;
-}
+
 .v-application a {
   color: white;
   text-decoration: none;
 }
+
 .link {
   color: white;
   display: flex;
@@ -270,6 +228,7 @@ export default {
   align-content: center;
   flex-direction: column;
   text-align: center !important;
+
   &:hover {
     cursor: pointer;
   }
@@ -282,19 +241,34 @@ export default {
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
   transition: 0.3s;
+
   &:hover {
     background: rgb(255, 190, 68);
   }
 }
+.nav-links {
+  justify-content: center !important;
+  & a {
+    margin: 0 auto;
+    width: 24% !important;
+  }
+}
+.cart-link {
+  position: relative;
+}
 #cartCount {
   position: absolute;
   top: -9px;
-  right: -12px;
-  background: orange;
+  right: 8px;
+  background: #333333;
+  border: 1px solid rgb(104, 250, 220);
+  background-color: rgb(104, 250, 220);
+  color: white;
   border-radius: 50%;
   font-size: 12px;
   padding: 2px;
   text-align: center;
-  width: 20px;
+  width: 22px;
+  height: 22px;
 }
 </style>

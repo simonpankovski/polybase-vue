@@ -17,9 +17,12 @@
           <td>{{ row.item.price }}</td>
           <td>{{ row.item.type }}</td>
           <td>
-            <v-btn small @click="onButtonClick(row.item)">
-              <v-icon>mdi-cloud-download</v-icon>
-            </v-btn>
+            <v-icon
+              @click="onButtonClick(row.item)"
+              color="rgb(104 250 220 / 65%)"
+              background="white"
+              >mdi-cloud-download</v-icon
+            >
           </td>
           <td>
             <v-rating
@@ -29,26 +32,18 @@
               empty-icon="$ratingFull"
               half-increments
               hover
-              large
+              medium
               @input="handleRatingChange(row.item)"
             ></v-rating>
           </td>
         </tr>
       </template>
     </v-data-table>
-    <v-snackbar
-      v-model="snackbar"
-      :timeout="timeout"
-    >
+    <v-snackbar v-model="snackbar" :timeout="timeout" top>
       {{ text }}
 
       <template v-slot:action="{ attrs }">
-        <v-btn
-          color="pink"
-          text
-          v-bind="attrs"
-          @click="snackbar = false"
-        >
+        <v-btn color="pink" text v-bind="attrs" @click="snackbar = false">
           Close
         </v-btn>
       </template>
@@ -77,27 +72,33 @@ export default {
       items: [],
       snackbar: false,
       text: `Rating updated successfully!`,
-      timeout: 3000
+      timeout: 3000,
     };
   },
   methods: {
     ...mapGetters(["getToken"]),
-    handleRatingChange(item){
+    handleRatingChange(item) {
       let jwt = "Bearer " + this.getToken();
-       fetch("http://localhost:8000/api/purchase/" + item.objectId + "?type=" + item.type, {
-        method: "POST",
-        mode: "cors",
-        headers: {
-          Authorization: jwt,
-          "Access-Control-Allow-Origin": "*",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({rating: item.rating})
-      })
+      fetch(
+        "http://localhost:8000/api/purchase/" +
+          item.objectId +
+          "?type=" +
+          item.type,
+        {
+          method: "POST",
+          mode: "cors",
+          headers: {
+            Authorization: jwt,
+            "Access-Control-Allow-Origin": "*",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ rating: item.rating }),
+        }
+      )
         .then((res) => res.json())
         .then((json) => {
           this.snackbar = true;
-          console.log(json)
+          console.log(json);
         });
     },
     onButtonClick(obj) {
@@ -120,7 +121,7 @@ export default {
   },
   beforeMount() {
     if (this.getToken() === "") {
-        this.$router.push("/login");
+      this.$router.push("/login");
     }
   },
   created: function () {

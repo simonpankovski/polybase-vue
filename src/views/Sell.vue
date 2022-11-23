@@ -23,14 +23,10 @@
 
       <v-tabs-items v-model="tab" dark>
         <v-tab-item :value="'tab-1'">
-          
-            <model-form></model-form>
-          
+          <model-form></model-form>
         </v-tab-item>
         <v-tab-item :value="'tab-2'">
-          
-            <texture-form></texture-form>
-          
+          <texture-form></texture-form>
         </v-tab-item>
       </v-tabs-items>
     </v-card>

@@ -8,7 +8,7 @@
     ></v-progress-circular>
     <div id="canvas" class="heightHundred"></div>
     <div class="mt-5">
-      <v-simple-table class="bg-color">
+      <v-simple-table>
         <template v-slot:default>
           <tbody>
             <tr>
@@ -21,7 +21,9 @@
             </tr>
             <tr>
               <td>Total Size (Uncompressed)</td>
-              <td>{{ Math.round((modelSize + textureSizes) * 100) / 100 }} MB</td>
+              <td>
+                {{ Math.round((modelSize + textureSizes) * 100) / 100 }} MB
+              </td>
             </tr>
           </tbody>
         </template>
@@ -34,6 +36,7 @@
 import { mapGetters } from "vuex";
 import * as Three from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
 export default {
@@ -59,6 +62,21 @@ export default {
       hdr: require("@/assets/studio_country_hall_1k.hdr"),
       modelSize: 0,
       textureSizes: 0,
+      gui: null,
+      params: {
+        color: 0xffffff,
+        transmission: 1,
+        opacity: 1,
+        metalness: 0,
+        roughness: 0,
+        ior: 1.5,
+        thickness: 0.01,
+        specularIntensity: 1,
+        specularColor: 0xffffff,
+        envMapIntensity: 1,
+        lightIntensity: 1,
+        exposure: 1,
+      },
     };
   },
   props: ["modelData", "modelId"],
@@ -92,10 +110,10 @@ export default {
           let modelToRender = null;
           let textures = [];
           blob[0].forEach((element) => {
-            console.log(element);
             if (
               element.headers["content-disposition"][0]
-                .split("=")[1].toLowerCase()
+                .split("=")[1]
+                .toLowerCase()
                 .includes(".fbx")
             ) {
               modelToRender = element.file;
@@ -127,28 +145,34 @@ export default {
       let container = document.getElementById("canvas");
       const loader = new FBXLoader();
       this.camera = new Three.PerspectiveCamera(
-        70,
+        90,
         container.clientWidth / container.clientHeight,
         0.01,
         1000
       );
-      this.camera.position.z = 4;
-      this.camera.position.x = 100;
-      const light = new Three.DirectionalLight(0xffffff, 2);
-      light.position.set(10, 10, 15);
+      this.camera.position.z = 0;
+      this.camera.position.x = 10;
+      this.camera.position.y = 40;
+      const light = new Three.DirectionalLight(
+        0xffffff,
+        this.params.lightIntensity
+      );
+      light.position.set(10, 10, 150);
       this.scene = new Three.Scene();
-      this.scene.background = new Three.Color("#575454");
+      this.scene.background = new Three.Color(0xffffff);
       let self = this;
       let hdr = this.hdr;
       const textureLoader = new Three.TextureLoader();
       this.renderer = new Three.WebGLRenderer({ antialias: true });
       this.renderer.outputEncoding = Three.sRGBEncoding;
       this.renderer.toneMapping = Three.ACESFilmicToneMapping;
-      this.renderer.toneMappingExposure = 1.25;
+      this.renderer.toneMappingExposure = 1;
       this.renderer.setSize(container.clientWidth, container.clientHeight);
       this.renderer.setPixelRatio(window.devicePixelRatio);
       this.renderer.physicallyCorrectLights = true;
+      this.renderer.shadowMap.enabled = true;
       loader.load(blob, function (object) {
+        console.log(object);
         object.traverse(function (child) {
           if (child instanceof Three.Mesh) {
             let data = textures;
@@ -171,15 +195,11 @@ export default {
               } else if (filename.includes("METAL")) {
                 self.metal = element.file;
                 self.isMetal = true;
-              } else if (
-                filename.includes("TRANS") ||
-                filename.includes("SSS")
-              ) {
+              } else if (filename.includes("TRANS")) {
                 self.transmission = element.file;
-                if (filename.includes("TRANS")) self.isGlass = true;
+                self.isGlass = true;
               }
             });
-            let envmapLoader = new Three.PMREMGenerator(self.renderer);
             let colorMap = textureLoader.load(self.color);
             let roughnessMap = textureLoader.load(self.rough);
             let normalMap = textureLoader.load(self.normal);
@@ -187,38 +207,111 @@ export default {
             let transmissionMap = textureLoader.load(self.transmission);
 
             new RGBELoader().load(hdr, function (hdrMap) {
-              let envMap = envmapLoader.fromCubemap(hdrMap);
-              let en = Three.EquirectangularReflectionMapping;
-              self.scene.background = envMap.texture;
+              hdrMap.mapping = Three.EquirectangularReflectionMapping;
+              self.scene.background = hdrMap;
 
               const material = new Three.MeshPhysicalMaterial({
                 map: colorMap,
-                envMap: en,
+                envMap: hdrMap,
+                envMapIntensity: 1,
                 normalMap: normalMap,
                 roughnessMap: roughnessMap,
+                roughness: self.params.roughness,
+                specularColor: 0xffffff,
+                specularIntensity: self.params.specularIntensity,
                 transmissionMap,
+                transmission: self.params.transmission,
                 aoMap,
-                opacity: 1,
+                opacity: self.params.opacity,
+                ior: self.params.ior,
               });
 
-              if (self.isGlass) {
-                material.roughness = 0;
-                material.metalness = 0;
-                material.transmission = 1;
-                material.thickness = 0.02;
-                material.ior = 2;
-              } else if (self.metal) {
-                material.metalness = 1;
-                material.roughness = 0;
-                material.ior = 1.5;
-              }
-              if (self.ao != null)
-                child.geometry.attributes.uv2 = child.geometry.attributes.uv;
               child.material = material;
             });
           }
         });
+        if (self.aoMap) {
+          object.attributes.uv2 = object.attributes.uv;
+        }
+        self.gui = new GUI();
 
+        self.gui.domElement.style.top = "14.8vh";
+        self.gui.domElement.style.left = "51%";
+        // self.gui.domElement.style.transform = "translateX(-50%)";
+        const lightFolder = self.gui.addFolder("Light");
+        lightFolder
+          .add(self.params, "lightIntensity", 0, 10, 0.01)
+          .onChange(function () {
+            light.intensity = self.params.lightIntensity;
+          });
+        object.children.forEach((element, index) => {
+          const meshFolder = self.gui.addFolder("Mesh " + (index + 1));
+
+          meshFolder.addColor(self.params, "color").onChange(function () {
+            element.material.color.set(self.params.color);
+          });
+          meshFolder
+            .add(self.params, "transmission", 0, 1, 0.01)
+            .onChange(function () {
+              element.material.transmission = self.params.transmission;
+            });
+
+          meshFolder
+            .add(self.params, "opacity", 0, 1, 0.01)
+            .onChange(function () {
+              element.material.opacity = self.params.opacity;
+            });
+
+          meshFolder
+            .add(self.params, "metalness", 0, 1, 0.01)
+            .onChange(function () {
+              element.material.metalness = self.params.metalness;
+            });
+
+          meshFolder
+            .add(self.params, "roughness", 0, 1, 0.01)
+            .onChange(function () {
+              element.material.roughness = self.params.roughness;
+            });
+
+          meshFolder.add(self.params, "ior", 1, 2, 0.01).onChange(function () {
+            element.material.ior = self.params.ior;
+          });
+
+          meshFolder
+            .add(self.params, "thickness", 0, 5, 0.01)
+            .onChange(function () {
+              element.material.thickness = self.params.thickness;
+            });
+
+          meshFolder
+            .add(self.params, "specularIntensity", 0, 1, 0.01)
+            .onChange(function () {
+              element.material.specularIntensity =
+                self.params.specularIntensity;
+            });
+
+          meshFolder
+            .addColor(self.params, "specularColor")
+            .onChange(function () {
+              element.material.specularColor.set(self.params.specularColor);
+            });
+
+          meshFolder
+            .add(self.params, "envMapIntensity", 0, 1, 0.01)
+            .name("envMap intensity")
+            .onChange(function () {
+              element.material.envMapIntensity = self.params.envMapIntensity;
+            });
+
+          meshFolder
+            .add(self.params, "exposure", 0, 1, 0.01)
+            .onChange(function () {
+              self.renderer.toneMappingExposure = self.params.exposure;
+            });
+        });
+
+        //self.gui.open();
         self.scene.add(object, light);
         self.mesh = object;
       });
@@ -233,10 +326,24 @@ export default {
       this.controls.update();
       this.renderer.render(this.scene, this.camera);
     },
+    render() {
+      this.renderer.render(this.scene, this.camera);
+    },
+    onWindowResize() {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      this.camera.aspect = width / height;
+      this.camera.updateProjectionMatrix();
+
+      this.renderer.setSize(width, height);
+    },
   },
   mounted() {
-    console.log(this.modelData);
     this.clicked();
+  },
+  beforeDestroy() {
+    this.gui.destroy();
+    this.gui = null;
   },
 };
 </script>
