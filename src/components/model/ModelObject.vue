@@ -96,7 +96,10 @@ export default {
       let token = "Bearer " + this.getToken();
       console.log(token);
       fetch(
-        "http://localhost:8000/api/model/" + this.modelId + "?browse=true",
+        process.env.VUE_APP_BACKEND_SERVICE_URL +
+          "model/" +
+          this.modelId +
+          "?browse=true",
         {
           method: "GET",
           mode: "cors",

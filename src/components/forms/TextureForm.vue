@@ -148,7 +148,7 @@ export default {
         data.append("category", this.category);
 
         let token = "Bearer " + this.getToken();
-        fetch("http://localhost:8000/api/texture/", {
+        fetch(process.env.VUE_APP_BACKEND_SERVICE_URL + "texture/", {
           method: "POST",
           mode: "cors",
           headers: {
