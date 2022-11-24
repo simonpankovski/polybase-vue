@@ -106,7 +106,7 @@ export default {
         const data = new FormData(e.target);
         const value = Object.fromEntries(data.entries());
         this.loading = true;
-        fetch("http://localhost:8000/api/register", {
+        fetch(process.env.VUE_APP_BACKEND_SERVICE_URL + "register", {
           method: "POST",
           mode: "cors",
           headers: {

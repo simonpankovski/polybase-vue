@@ -153,7 +153,7 @@ export default {
       window.location.reload();
     },
     getCartItemsCount(token) {
-      fetch("http://localhost:8000/api/cart/count", {
+      fetch(process.env.VUE_APP_BACKEND_SERVICE_URL + "cart/count", {
         method: "GET",
         mode: "cors",
         headers: {

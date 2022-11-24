@@ -87,7 +87,7 @@ export default {
     tokenCreated() {
       let jwt = "Bearer " + this.getToken();
       this.loading = true;
-      fetch("http://localhost:8000/api/cart/checkout", {
+      fetch(process.env.VUE_APP_BACKEND_SERVICE_URL + "cart/checkout", {
         method: "POST",
         mode: "cors",
         headers: {
@@ -108,7 +108,7 @@ export default {
     },
     getClientSecret() {
       let token = "Bearer " + this.getToken();
-      fetch("http://localhost:8000/api/cart/checkout", {
+      fetch(process.env.VUE_APP_BACKEND_SERVICE_URL + "cart/checkout", {
         method: "GET",
         mode: "cors",
         headers: {
@@ -126,7 +126,7 @@ export default {
       this.items = this.items.filter((d) => d.id !== item.id);
       let token = "Bearer " + this.getToken();
       fetch(
-        "http://localhost:8000/api/cart/" +
+        process.env.VUE_APP_BACKEND_SERVICE_URL + "cart/" +
           item.objectId +
           "?type=" +
           item.type,
@@ -149,7 +149,7 @@ export default {
   created: function () {
     let token = "Bearer " + this.getToken();
     console.log(token);
-    fetch("http://localhost:8000/api/cart/", {
+    fetch(process.env.VUE_APP_BACKEND_SERVICE_URL + "cart/", {
       method: "GET",
       mode: "cors",
       headers: {

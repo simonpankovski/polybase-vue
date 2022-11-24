@@ -183,7 +183,7 @@ export default {
         data.append("category", this.category);
 
         let token = "Bearer " + this.getToken();
-        fetch("http://localhost:8000/api/model/", {
+        fetch(process.env.VUE_APP_BACKEND_SERVICE_URL + "model/", {
           method: "POST",
           mode: "cors",
           headers: {
@@ -217,7 +217,7 @@ export default {
     if (token == "") {
       this.$router.push("/login");
     }
-    fetch("http://localhost:8000/api/tag", {
+    fetch(process.env.VUE_APP_BACKEND_SERVICE_URL + "tag", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

@@ -148,6 +148,7 @@ export default {
       this.$store.commit("setSearchTerm", this.searchText);
     },
     getResults() {
+      console.log(process.env.VUE_APP_BACKEND_SERVICE_URL);
       let token = this.getToken();
       let pathName = window.location.pathname.split("/");
       let category = "";
@@ -160,7 +161,8 @@ export default {
       if (category == "All" || category == "all") category = "";
       if (type == "Models") {
         fetch(
-          "http://localhost:8000/api/model/?category=" +
+          process.env.VUE_APP_BACKEND_SERVICE_URL +
+            "model/?category=" +
             category +
             "&page=" +
             this.page +
@@ -182,7 +184,8 @@ export default {
           });
       } else if (type == "Textures") {
         fetch(
-          "http://localhost:8000/api/texture/?category=" +
+          process.env.VUE_APP_BACKEND_SERVICE_URL +
+            "texture/?category=" +
             category +
             "&page=" +
             this.page +

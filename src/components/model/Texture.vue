@@ -56,7 +56,10 @@ export default {
     clicked: function () {
       let token = "Bearer " + this.getToken();
       fetch(
-        "http://localhost:8000/api/texture/" + this.modelId + "?browse=true",
+        process.env.VUE_APP_BACKEND_SERVICE_URL +
+          "texture/" +
+          this.modelId +
+          "?browse=true",
         {
           method: "GET",
           mode: "cors",

@@ -260,7 +260,7 @@ export default {
       let type = this.isModel ? "model" : "texture";
       let jwt = "Bearer " + this.getToken();
 
-      fetch("http://localhost:8000/api/" + type + "/" + this.modelData.id, {
+      fetch(process.env.VUE_APP_BACKEND_SERVICE_URL + type + "/" + this.modelData.id, {
         method: "GET",
         mode: "cors",
         headers: {
@@ -279,7 +279,8 @@ export default {
       let token = "Bearer " + this.getToken();
       let model = this.isModel ? "model" : "texture";
       fetch(
-        "http://localhost:8000/api/cart/" +
+        process.env.VUE_APP_BACKEND_SERVICE_URL +
+          "cart/" +
           this.modelData.id +
           "?type=" +
           model,
