@@ -80,7 +80,8 @@ export default {
     handleRatingChange(item) {
       let jwt = "Bearer " + this.getToken();
       fetch(
-        "http://localhost:8000/api/purchase/" +
+        process.env.VUE_APP_BACKEND_SERVICE_URL +
+          "purchase/" +
           item.objectId +
           "?type=" +
           item.type,
@@ -103,7 +104,7 @@ export default {
     },
     onButtonClick(obj) {
       let jwt = "Bearer " + this.getToken();
-      fetch("http://localhost:8000/api/" + obj.type + "/" + obj.objectId, {
+      fetch(process.env.VUE_APP_BACKEND_SERVICE_URL + obj.type + "/" + obj.objectId, {
         method: "GET",
         mode: "cors",
         headers: {
@@ -126,7 +127,7 @@ export default {
   },
   created: function () {
     let token = "Bearer " + this.getToken();
-    fetch("http://localhost:8000/api/purchase/", {
+    fetch(process.env.VUE_APP_BACKEND_SERVICE_URL + "purchase/", {
       method: "GET",
       mode: "cors",
       headers: {

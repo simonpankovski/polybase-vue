@@ -87,7 +87,7 @@ export default {
           const data = new FormData(e.target);
           const value = Object.fromEntries(data.entries());
           this.loading = true;
-          fetch("http://localhost:8000/api/login_check", {
+          fetch(process.env.VUE_APP_BACKEND_SERVICE_URL + "login_check", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
