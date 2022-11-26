@@ -31,9 +31,20 @@ html {
   font-family: "Quicksand", sans-serif !important;
 }
 .v-overlay__content {
-  width: 100% !important;  
+  height: 100% !important;
+  overflow: auto !important;
+}
+@media screen and (min-width: 600px) {
+  .v-overlay__content {
+    width: 1300px;
+    overflow: hidden !important;
+  }
 }
 #main {
   background: rgb(49, 49, 49);
+}
+#gui.root .title {
+  font-size: inherit !important;
+  line-height: 21px !important;
 }
 </style>

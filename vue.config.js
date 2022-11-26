@@ -1,10 +1,10 @@
 module.exports = {
     transpileDependencies: ["vuetify"],
-    devServer: {
-        host: "localhost",
-        port: "8080",
-        public: "0.0.0.0:8080",
-    },
+    // devServer: {
+    //     host: "localhost",
+    //     port: "8080",
+    //     public: "0.0.0.0:8080",
+    // },
     configureWebpack: {
         module: {
             rules: [

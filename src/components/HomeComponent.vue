@@ -8,8 +8,8 @@
         Refine your scenes with a curated selection of digital content.
       </h2>
       <router-link to="/browse/models/all" id="no-decoration">
-        <v-btn class="white--text mt-10" id="browse" x-large @click="clicked"
-          ><span>Browse</span></v-btn
+        <v-btn class="black--text mt-10" id="browse" x-large @click="clicked"
+          ><span >Browse</span></v-btn
         ></router-link
       >
     </div>
