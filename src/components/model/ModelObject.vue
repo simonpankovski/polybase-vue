@@ -1,16 +1,22 @@
 <template>
-  <div id="wrapper" class="heightHundred">
-    <v-progress-circular
-      indeterminate
-      color="orange"
-      :size="100"
-      v-if="loading"
-    ></v-progress-circular>
-    <div id="canvasWrapper" class="heightHundred">
-      <div id="canvas"></div>
+  <div id="canvasWrapper" class="heightHundred">
+    <div id="canvas">
+      <div class="play" v-if="!loadingComplete">
+        <v-progress-circular
+          indeterminate
+          color="orange"
+          :size="100"
+          v-if="loading"
+        ></v-progress-circular>
+        <img
+          v-if="shouldLoad"
+          src="../../assets/play.png"
+          @click="loadModel"
+          alt=""
+        />
+      </div>
     </div>
-
-    <div class="mt-15">
+    <div class="mt-5">
       <v-simple-table>
         <template v-slot:default>
           <tbody>
@@ -45,21 +51,23 @@ import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
 export default {
   data() {
     return {
-      loading: true,
+      loading: false,
+      shouldLoad: true,
+      loadingComplete: false,
       camera: null,
       scene: null,
       renderer: null,
       mesh: null,
       controls: null,
       file: "",
-      roughness: 10,
       color: null,
-      metalness: 45,
       normal: null,
+      bump: null,
       disp: null,
       ao: null,
       metal: null,
       rough: null,
+      transmission: null,
       isGlass: false,
       isMetal: false,
       hdr: require("@/assets/studio_country_hall_1k.hdr"),
@@ -76,15 +84,21 @@ export default {
         thickness: 0.01,
         specularIntensity: 1,
         specularColor: 0xffffff,
-        envMapIntensity: 1,
+        envMapIntensity: 0.5,
         lightIntensity: 1,
         exposure: 1,
+        displacementScale: 0.1,
       },
     };
   },
   props: ["modelData", "modelId"],
   methods: {
     ...mapGetters(["getToken"]),
+    loadModel: function () {
+      this.loading = true;
+      this.shouldLoad = false;
+      this.clicked();
+    },
     blobToDataURL: function (blob, callback) {
       var a = new FileReader();
       a.onload = function (e) {
@@ -136,7 +150,6 @@ export default {
     },
     init: function (blob, textures) {
       const modelSize = Buffer.from(blob.substring(blob.indexOf(",") + 1));
-
       this.modelSize = Math.round((modelSize.length / 1e6 / 1.33) * 100) / 100;
       let textureSize = 0;
       textures.forEach((element) => {
@@ -158,11 +171,11 @@ export default {
       this.camera.position.z = 0;
       this.camera.position.x = 10;
       this.camera.position.y = 40;
-      const light = new Three.DirectionalLight(
-        0xffffff,
-        this.params.lightIntensity
-      );
-      light.position.set(10, 10, 150);
+      // const light = new Three.DirectionalLight(
+      //   0xffffff,
+      //   this.params.lightIntensity
+      // );
+      // light.position.set(10, 10, 150);
       this.scene = new Three.Scene();
       this.scene.background = new Three.Color(0xffffff);
       let self = this;
@@ -176,159 +189,164 @@ export default {
       this.renderer.setPixelRatio(window.devicePixelRatio);
       this.renderer.physicallyCorrectLights = true;
       this.renderer.shadowMap.enabled = true;
-      loader.load(blob, function (object) {
-        console.log(object);
-        object.traverse(function (child) {
-          if (child instanceof Three.Mesh) {
-            let data = textures;
-            data.forEach((element) => {
-              let filename =
-                element.headers["content-disposition"][0].split("=")[1];
-              if (filename.includes("COL")) {
-                self.color = element.file;
-              } else if (filename.includes("AO")) {
-                self.ao = element.file;
-              } else if (filename.includes("DISP")) {
-                self.disp = element.file;
-              } else if (filename.includes("NRM")) {
-                self.normal = element.file;
-              } else if (
-                filename.includes("ROUGH") ||
-                filename.includes("GLOSS")
-              ) {
-                self.rough = element.file;
-              } else if (filename.includes("METAL")) {
-                self.metal = element.file;
-                self.isMetal = true;
-              } else if (filename.includes("TRANS")) {
-                self.transmission = element.file;
-                self.isGlass = true;
-              }
-            });
-            let colorMap = textureLoader.load(self.color);
-            let roughnessMap = textureLoader.load(self.rough);
-            let normalMap = textureLoader.load(self.normal);
-            let aoMap = textureLoader.load(self.ao);
-            let transmissionMap = textureLoader.load(self.transmission);
+      new RGBELoader().load(hdr, function (hdrMap) {
+        hdrMap.mapping = Three.EquirectangularReflectionMapping;
+        let envMapPMREM = new Three.PMREMGenerator(
+          self.renderer
+        ).fromEquirectangular(hdrMap).texture;
+        envMapPMREM.mapping = Three.CubeUVReflectionMapping;
+        self.scene.background = envMapPMREM;
+        console.log(self.ao);
+        loader.load(blob, function (object) {
+          self.gui = new GUI({
+            container: document.getElementById("canvasWrapper"),
+            touchStyles: false,
+          });
+          const gui = self.gui;
+          gui.domElement.id = "gui";
+          gui.domElement.style.position = "absolute";
+          gui.domElement.style.top = "0";
 
-            new RGBELoader().load(hdr, function (hdrMap) {
-              hdrMap.mapping = Three.EquirectangularReflectionMapping;
-              self.scene.background = hdrMap;
+          //const lightFolder = gui.addFolder("Light");
+          // lightFolder
+          //   .add(self.params, "lightIntensity", 0, 10, 0.01)
+          //   .onChange(function () {
+          //     light.intensity = self.params.lightIntensity;
+          //   });
+          let index = 1;
+          object.traverse(function (child) {
+            if (child instanceof Three.Mesh) {
+              let data = textures;
+              data.forEach((element) => {
+                let filename =
+                  element.headers["content-disposition"][0].split("=")[1];
+                if (filename.includes("COL")) {
+                  self.color = textureLoader.load(element.file);
+                } else if (filename.includes("AO")) {
+                  self.ao = textureLoader.load(element.file);
+                } else if (filename.includes("DISP")) {
+                  self.disp = textureLoader.load(element.file);
+                } else if (filename.includes("NRM")) {
+                  self.normal = textureLoader.load(element.file);
+                } else if (filename.includes("BUMP")) {
+                  self.bump = textureLoader.load(element.file);
+                } else if (
+                  filename.includes("ROUGH") ||
+                  filename.includes("GLOSS")
+                ) {
+                  self.rough = textureLoader.load(element.file);
+                } else if (filename.includes("METAL")) {
+                  self.metal = textureLoader.load(element.file);
+                  self.isMetal = true;
+                } else if (filename.includes("TRANS")) {
+                  self.transmission = textureLoader.load(element.file);
+                  self.isGlass = true;
+                }
+              });
 
               const material = new Three.MeshPhysicalMaterial({
-                map: colorMap,
+                map: self.color,
                 envMap: hdrMap,
-                envMapIntensity: 1,
-                normalMap: normalMap,
-                roughnessMap: roughnessMap,
-                roughness: self.params.roughness,
-                specularColor: 0xffffff,
-                specularIntensity: self.params.specularIntensity,
-                transmissionMap,
-                transmission: self.params.transmission,
-                aoMap,
-                opacity: self.params.opacity,
-                ior: self.params.ior,
+                normalMap: self.normal,
+                roughnessMap: self.rough,
+                transmissionMap: self.transmission,
+                metalnessMap: self.metal,
+                bumpMap: self.bump,
+                aoMap: self.ao,
+                displacementScale: self.params.displacementScale,
               });
 
               child.material = material;
-            });
-          }
-        });
-        if (self.aoMap) {
-          object.attributes.uv2 = object.attributes.uv;
-        }
-        self.gui = new GUI({
-          container: document.getElementById("canvasWrapper"),
-        });
-        const gui = self.gui;
-        gui.domElement.id = "gui";
-        // console.log(gui)
-        // container.appendChild(gui.domElement)
-        gui.domElement.style.position = "absolute";
-        gui.domElement.style.top = "0";
-        const lightFolder = gui.addFolder("Light");
-        lightFolder
-          .add(self.params, "lightIntensity", 0, 10, 0.01)
-          .onChange(function () {
-            light.intensity = self.params.lightIntensity;
+              if (self.ao) {
+                console.log(child);
+                child.geometry.attributes.uv2 = child.geometry.attributes.uv;
+              }
+              const meshFolder = gui.addFolder("Mesh " + index++);
+
+              meshFolder.addColor(self.params, "color").onChange(function () {
+                child.material.color.set(self.params.color);
+              });
+              meshFolder
+                .add(self.params, "transmission", 0, 1, 0.01)
+                .onChange(function () {
+                  child.material.transmission = self.params.transmission;
+                });
+
+              meshFolder
+                .add(self.params, "opacity", 0, 1, 0.01)
+                .onChange(function (value) {
+                  child.material.opacity = value;
+                });
+
+              meshFolder
+                .add(self.params, "metalness", 0, 1, 0.01)
+                .onChange(function () {
+                  child.material.metalness = self.params.metalness;
+                });
+
+              meshFolder
+                .add(self.params, "roughness", 0, 1, 0.01)
+                .onChange(function () {
+                  child.material.roughness = self.params.roughness;
+                });
+
+              meshFolder
+                .add(self.params, "ior", 1, 2, 0.01)
+                .onChange(function (value) {
+                  child.material.ior = value;
+                });
+
+              meshFolder
+                .add(self.params, "thickness", 0, 5, 0.01)
+                .onChange(function () {
+                  child.material.thickness = self.params.thickness;
+                });
+
+              meshFolder
+                .add(self.params, "specularIntensity", 0, 1, 0.01)
+                .onChange(function () {
+                  child.material.specularIntensity =
+                    self.params.specularIntensity;
+                });
+
+              meshFolder
+                .addColor(self.params, "specularColor")
+                .onChange(function () {
+                  child.material.specularColor.set(self.params.specularColor);
+                });
+
+              meshFolder
+                .add(self.params, "envMapIntensity", 0, 1, 0.01)
+                .name("envMap intensity")
+                .onChange(function () {
+                  child.material.envMapIntensity = self.params.envMapIntensity;
+                });
+
+              meshFolder
+                .add(self.params, "exposure", 0, 1, 0.01)
+                .onChange(function () {
+                  self.renderer.toneMappingExposure = self.params.exposure;
+                });
+              meshFolder
+                .add(self.params, "displacementScale", 0, 1, 0.01)
+                .onChange(function (value) {
+                  child.material.displacementScale = value;
+                });
+            }
           });
-        object.children.forEach((element, index) => {
-          const meshFolder = gui.addFolder("Mesh " + (index + 1));
 
-          meshFolder.addColor(self.params, "color").onChange(function () {
-            element.material.color.set(self.params.color);
-          });
-          meshFolder
-            .add(self.params, "transmission", 0, 1, 0.01)
-            .onChange(function () {
-              element.material.transmission = self.params.transmission;
-            });
+          self.gui.close();
+          self.scene.add(object); // ,light
 
-          meshFolder
-            .add(self.params, "opacity", 0, 1, 0.01)
-            .onChange(function () {
-              element.material.opacity = self.params.opacity;
-            });
-
-          meshFolder
-            .add(self.params, "metalness", 0, 1, 0.01)
-            .onChange(function () {
-              element.material.metalness = self.params.metalness;
-            });
-
-          meshFolder
-            .add(self.params, "roughness", 0, 1, 0.01)
-            .onChange(function () {
-              element.material.roughness = self.params.roughness;
-            });
-
-          meshFolder.add(self.params, "ior", 1, 2, 0.01).onChange(function () {
-            element.material.ior = self.params.ior;
-          });
-
-          meshFolder
-            .add(self.params, "thickness", 0, 5, 0.01)
-            .onChange(function () {
-              element.material.thickness = self.params.thickness;
-            });
-
-          meshFolder
-            .add(self.params, "specularIntensity", 0, 1, 0.01)
-            .onChange(function () {
-              element.material.specularIntensity =
-                self.params.specularIntensity;
-            });
-
-          meshFolder
-            .addColor(self.params, "specularColor")
-            .onChange(function () {
-              element.material.specularColor.set(self.params.specularColor);
-            });
-
-          meshFolder
-            .add(self.params, "envMapIntensity", 0, 1, 0.01)
-            .name("envMap intensity")
-            .onChange(function () {
-              element.material.envMapIntensity = self.params.envMapIntensity;
-            });
-
-          meshFolder
-            .add(self.params, "exposure", 0, 1, 0.01)
-            .onChange(function () {
-              self.renderer.toneMappingExposure = self.params.exposure;
-            });
+          self.mesh = object;
         });
-
-        self.gui.close();
-        self.scene.add(object, light);
-
-        self.mesh = object;
       });
       container.appendChild(this.renderer.domElement);
       this.renderer.render(this.scene, this.camera);
-      this.loading = false;
+
       this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+      self.loading = false;
+      self.loadingComplete = true;
     },
     animate() {
       let container = document.getElementById("canvas");
@@ -350,9 +368,7 @@ export default {
       this.renderer.setSize(width, height);
     },
   },
-  mounted() {
-    this.clicked();
-  },
+  mounted() {},
   beforeDestroy() {
     this.gui.destroy();
     this.gui = null;
@@ -362,34 +378,49 @@ export default {
 <style lang="scss">
 #canvas {
   width: 100% !important;
-  height: 100% !important;
-
+  max-width: 700px !important;
+  max-height: 700px !important;
+  aspect-ratio: 1.15;
+  background: #333333;
+  position: relative;
+  & .play {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: #333333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    & img {
+      width: 50px;
+      height: 50px;
+      transition: transform 0.2s ease-in;
+      &:hover {
+        cursor: pointer;
+        transform: scale(1.5);
+      }
+    }
+  }
   canvas {
-    width: 80%;
+    height: 100% !important;
+    width: 100%;
   }
 }
 
 #canvasWrapper {
   position: relative;
-}
-
-.heightHundred {
-  height: 80%;
+  height: 100% !important;
+  max-width: 700px !important;
 }
 
 .bg-color {
   background: #333333 !important;
   padding: 20px;
 }
-
 .v-progress-circular {
   position: absolute;
-  top: 25%;
-  right: 25%;
-}
-
-#gui.root .title {
-  font-size: inherit !important;
-  line-height: 21px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

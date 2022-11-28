@@ -92,131 +92,126 @@
       </v-btn>
       <v-overlay :z-index="zIndex" :value="overlay">
         <v-card elevation="2" class="overlay">
-          <v-container id="container">
-            <div
-              class="d-flex justify-space-between px-3"
-              style="padding-top: 10px"
-            >
-              <v-snackbar class="mt-16" top v-model="snackbar">
-                {{ text }}
+          <div
+            class="d-flex justify-space-between px-3"
+            style="padding-top: 10px"
+          >
+            <v-snackbar class="mt-16" top v-model="snackbar">
+              {{ text }}
 
-                <template v-slot:action="{ attrs }">
-                  <v-btn
-                    color="pink"
-                    text
-                    v-bind="attrs"
-                    @click="snackbar = false"
-                  >
-                    Close
-                  </v-btn>
+              <template v-slot:action="{ attrs }">
+                <v-btn
+                  color="pink"
+                  text
+                  v-bind="attrs"
+                  @click="snackbar = false"
+                >
+                  Close
+                </v-btn>
+              </template>
+            </v-snackbar>
+
+            <v-icon medium color="white" @click="overlay = false">
+              mdi-close
+            </v-icon>
+            <v-btn
+              fab
+              outlined
+              small
+              color="rgb(104 250 220 / 65%)"
+              @click="downloadModel"
+              v-if="displayDownloadButton"
+            >
+              <v-icon small color="rgb(104 250 220 / 65%)">
+                mdi-cloud-download-outline</v-icon
+              >
+            </v-btn>
+            <v-btn
+              v-else
+              class="rounded-0"
+              outlined
+              color="orange"
+              @click="addToCart"
+            >
+              <v-icon small color="orange"> mdi-cart </v-icon>
+            </v-btn>
+          </div>
+          <v-row class="mt-6">
+            <v-col sm="12" md="6" lg="5" xl="5" class="col-align">
+              <v-carousel
+                :continuous="true"
+                :cycle="this.cycle"
+                hide-delimiter-background
+                delimiter-icon="mdi-minus"
+                height="300"
+                width="400"
+                class="d-flex justify-center"
+              >
+                <v-carousel-item
+                  v-for="(item, i) in this.modelData.thumbnailLinks"
+                  :key="i"
+                >
+                  <v-img :src="item" max-height="300" width="400"></v-img>
+                </v-carousel-item>
+              </v-carousel>
+              <v-simple-table class="mt-10 bg-color" id="data-table">
+                <template v-slot:default>
+                  <tbody>
+                    <tr>
+                      <td>Model Name</td>
+                      <td>
+                        <h3>{{ modelData.name }}</h3>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Price</td>
+                      <td>{{ modelData.price }}€</td>
+                    </tr>
+                    <tr>
+                      <td>Created</td>
+                      <td>{{ dateTime }}</td>
+                    </tr>
+                    <tr>
+                      <td>Owner Email</td>
+                      <td>{{ modelData.ownerEmail }}</td>
+                    </tr>
+                    <tr>
+                      <td>Rating</td>
+                      <td>{{ modelData.rating.toFixed(1) }} / 5</td>
+                    </tr>
+                    <tr v-if="isModel">
+                      <td>Supported Formats</td>
+                      <td v-for="tag in modelData.tags" :key="tag">
+                        <v-chip
+                          class="ma-2"
+                          color="pink"
+                          label
+                          text-color="white"
+                        >
+                          <v-icon left> mdi-label </v-icon>
+                          {{ tag }}
+                        </v-chip>
+                      </td>
+                    </tr>
+                  </tbody>
                 </template>
-              </v-snackbar>
-              <v-btn
-                class="white--text rounded-0"
-                color="white"
-                outlined
-                @click="overlay = false"
+              </v-simple-table>
+            </v-col>
+            <v-col sm="12" md="6" lg="7" xl="7">
+              <model-object
+                :model-id="this.modelData.id"
+                :model-data="this.modelData"
+                v-if="this.isModel"
               >
-                <v-icon medium color="white"> mdi-close </v-icon>
-              </v-btn>
-              <v-btn
-                fab
-                outlined
-                small
-                color="rgb(104 250 220 / 65%)"
-                @click="downloadModel"
-                v-if="displayDownloadButton"
-              >
-                <v-icon small color="rgb(104 250 220 / 65%)">
-                  mdi-cloud-download-outline</v-icon
-                >
-              </v-btn>
-              <v-btn
+              </model-object>
+              <texture
+                :model-id="this.modelData.id"
+                :category="this.modelData.category"
+                :model-data="this.modelData"
                 v-else
-                class="rounded-0"
-                outlined
-                color="orange"
-                @click="addToCart"
-              >
-                <v-icon small color="orange"> mdi-cart </v-icon>
-              </v-btn>
-            </div>
-            <v-row class="mt-6">
-              <v-col sm="12" md="6">
-                <v-carousel
-                  :continuous="true"
-                  :cycle="this.cycle"
-                  hide-delimiter-background
-                  delimiter-icon="mdi-minus"
-                  height="300"
-                  class="d-flex justify-center"
-                >
-                  <v-carousel-item
-                    v-for="(item, i) in this.modelData.thumbnailLinks"
-                    :key="i"
-                  >
-                    <v-img :src="item" max-height="300" max-width="550"></v-img>
-                  </v-carousel-item>
-                </v-carousel>
-                <v-simple-table class="mt-10 bg-color" id="data-table">
-                  <template v-slot:default>
-                    <tbody>
-                      <tr>
-                        <td>Model Name</td>
-                        <td>
-                          <h3>{{ modelData.name }}</h3>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Price</td>
-                        <td>{{ modelData.price }}€</td>
-                      </tr>
-                      <tr>
-                        <td>Created</td>
-                        <td>{{ dateTime }}</td>
-                      </tr>
-                      <tr>
-                        <td>Owner Email</td>
-                        <td>{{ modelData.ownerEmail }}</td>
-                      </tr>
-                      <tr>
-                        <td>Rating</td>
-                        <td>{{ modelData.rating.toFixed(1) }} / 5</td>
-                      </tr>
-                      <tr v-if="isModel">
-                        <td>Supported Formats</td>
-                        <td v-for="tag in modelData.tags" :key="tag">
-                          <v-chip
-                            class="ma-2"
-                            color="pink"
-                            label
-                            text-color="white"
-                          >
-                            <v-icon left> mdi-label </v-icon>
-                            {{ tag }}
-                          </v-chip>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </template>
-                </v-simple-table>
-              </v-col>
-              <v-col sm="12" md="6" lg="6">
-                <model-object
-                  :model-id="this.modelData.id"
-                  :model-data="this.modelData"
-                  v-if="this.isModel"
-                >
-                </model-object>
-                <texture
-                  :model-id="this.modelData.id"
-                  :category="this.modelData.category"
-                  :model-data="this.modelData"
-                  v-else
-                ></texture>
-              </v-col>
-            </v-row>
-          </v-container>
+              ></texture>
+            </v-col>
+          </v-row>
         </v-card>
       </v-overlay>
     </v-card-actions>
@@ -260,15 +255,21 @@ export default {
       let type = this.isModel ? "model" : "texture";
       let jwt = "Bearer " + this.getToken();
 
-      fetch(process.env.VUE_APP_BACKEND_SERVICE_URL + type + "/" + this.modelData.id, {
-        method: "GET",
-        mode: "cors",
-        headers: {
-          Authorization: jwt,
-          "Access-Control-Allow-Origin": "*",
-          "Content-Type": "application/json",
-        },
-      })
+      fetch(
+        process.env.VUE_APP_BACKEND_SERVICE_URL +
+          type +
+          "/" +
+          this.modelData.id,
+        {
+          method: "GET",
+          mode: "cors",
+          headers: {
+            Authorization: jwt,
+            "Access-Control-Allow-Origin": "*",
+            "Content-Type": "application/json",
+          },
+        }
+      )
         .then((res) => res.blob())
         .then((blob) => {
           var file = window.URL.createObjectURL(blob);
@@ -321,6 +322,8 @@ export default {
   },
   watch: {
     overlayValue(newVal, oldVal) {
+      if (newVal) document.documentElement.style.overflow = "hidden";
+      else document.documentElement.style.overflow = "auto";
       console.log(newVal, oldVal, "overlay");
     },
   },
@@ -349,10 +352,13 @@ export default {
   margin: 0 auto;
 }
 .overlay {
+  position: relative;
+  top: 2%;
   overflow-y: auto;
   height: auto;
   padding: 0;
 }
+
 .row {
   margin: 0 !important;
 }
@@ -368,5 +374,11 @@ export default {
 
 .v-overlay--active {
   backdrop-filter: blur(5px) !important;
+}
+.col-align {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 </style>

@@ -68,12 +68,7 @@
       </div>
     </v-app-bar>
 
-    <v-navigation-drawer
-      v-model="drawer"
-      absolute
-      temporary
-      color="grey darken-4"
-    >
+    <v-navigation-drawer v-model="drawer" absolute temporary color="grey darken-4 nav-drawer">
       <template v-if="this.user == ''" class="d-flex">
         <div class="d-flex flex-column">
           <router-link to="/login" class="mx-15 mt-10 py-2 px-5" id="login"
@@ -132,7 +127,7 @@ export default {
   data: () => ({
     user: "",
     cartCount: 0,
-    items: [{ title: "Profile" }, { title: "Purchases" }],
+    items: [{ title: "Purchases" }],
     drawer: false,
     group: null,
     windowWidth: window.innerWidth,
@@ -236,6 +231,7 @@ export default {
 
 #register {
   background: orange;
+  color: black;
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
   border-top-right-radius: 5px;
@@ -277,5 +273,9 @@ export default {
 }
 .v-toolbar__content {
   padding: 0 !important;
+}
+.nav-drawer {
+  position: fixed;
+  z-index: 1000;
 }
 </style>

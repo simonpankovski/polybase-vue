@@ -1,7 +1,7 @@
 <template>
   <div id="main">
     <v-row class="mx-0 mt-11">
-      <v-col class="px-0" cols="12" sm="3" md="3" lg="2">
+      <v-col class="px-0 pt-7" cols="12" sm="3" md="3" lg="2">
         <v-card dark>
           <div class="px-4 relative">
             <input
@@ -50,7 +50,7 @@
           </v-list>
         </v-card>
       </v-col>
-      <v-col class="mt-5 mb-16">
+      <v-col class="mt-5 mb-16 content">
         <v-row class="mx-0" v-if="!isLoading">
           <v-col
             cols="12"
@@ -245,9 +245,9 @@ export default {
   color: white;
   transition: all 0.2s ease-in;
   &:focus {
-    border-color: orange;
+    border-color: #94d2bd;
     & + i {
-      color: orange;
+      color: #94d2bd;
     }
   }
 }
@@ -268,10 +268,10 @@ export default {
 }
 
 .router-link-active {
-  color: orange !important;
+  color: #94d2bd !important;
 }
 
 .v-application .primary--text {
-  color: orange !important;
+  color: #94d2bd !important;
 }
 </style>
