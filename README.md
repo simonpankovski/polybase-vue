@@ -37,4 +37,4 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 ### Building the image
 ``` docker build -t {image name} . ```
 ### Running the container
-``` docker run -d -p 8080:8080 {image name} ```
+``` docker run -d -p 80:80 {image name} ```
