@@ -106,7 +106,6 @@
 }
 
 .bg-color {
-  padding: 20px;
   background: #333333;
 }
 

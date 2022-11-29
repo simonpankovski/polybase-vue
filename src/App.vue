@@ -37,7 +37,7 @@ html {
 @media screen and (min-width: 600px) {
   .v-overlay__content {
     width: 1300px;
-    overflow: hidden !important;
+    /* overflow: hidden !important; */
   }
 }
 #main {
@@ -46,5 +46,8 @@ html {
 #gui.root .title {
   font-size: inherit !important;
   line-height: 21px !important;
+}
+.v-window__container {
+  width: 100% !important;
 }
 </style>

@@ -145,7 +145,7 @@ export default {
 
       // light.position.set(10, 10, 15);
       this.scene = new Three.Scene();
-      this.scene.background = new Three.Color("#575454");
+      this.scene.background = new Three.Color(0x1e1e1e);
       this.gui = new GUI({
         container: document.getElementById("canvasWrapper"),
         touchStyles: false,
@@ -174,7 +174,6 @@ export default {
           self.renderer
         ).fromEquirectangular(hdrMap).texture;
         envMapPMREM.mapping = Three.CubeUVReflectionMapping;
-        self.scene.background = envMapPMREM;
         const material = new Three.MeshPhysicalMaterial({
           map: self.color,
           normalMap: self.normal,
@@ -310,10 +309,8 @@ export default {
     & img {
       width: 50px;
       height: 50px;
-      transition: transform 0.2s ease-in;
       &:hover {
         cursor: pointer;
-        transform: scale(1.5);
       }
     }
   }
@@ -328,7 +325,7 @@ export default {
  
 }
 .bg-color {
-  padding: 20px;
+
   background: #333333;
 }
 </style>

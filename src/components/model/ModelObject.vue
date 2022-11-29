@@ -70,7 +70,7 @@ export default {
       transmission: null,
       isGlass: false,
       isMetal: false,
-      hdr: require("@/assets/studio_country_hall_1k.hdr"),
+      hdr: require("@/assets/studio_small_08_4k.hdr"),
       modelSize: 0,
       textureSizes: 0,
       gui: null,
@@ -177,7 +177,7 @@ export default {
       // );
       // light.position.set(10, 10, 150);
       this.scene = new Three.Scene();
-      this.scene.background = new Three.Color(0xffffff);
+      this.scene.background = new Three.Color(0x1e1e1e);
       let self = this;
       let hdr = this.hdr;
       const textureLoader = new Three.TextureLoader();
@@ -195,7 +195,7 @@ export default {
           self.renderer
         ).fromEquirectangular(hdrMap).texture;
         envMapPMREM.mapping = Three.CubeUVReflectionMapping;
-        self.scene.background = envMapPMREM;
+        //self.scene.background = envMapPMREM;
         console.log(self.ao);
         loader.load(blob, function (object) {
           self.gui = new GUI({
@@ -368,9 +368,10 @@ export default {
       this.renderer.setSize(width, height);
     },
   },
-  mounted() {},
+  mounted() {
+    console.log(this);
+  },
   beforeDestroy() {
-    this.gui.destroy();
     this.gui = null;
   },
 };
@@ -378,11 +379,12 @@ export default {
 <style lang="scss">
 #canvas {
   width: 100% !important;
-  max-width: 700px !important;
-  max-height: 700px !important;
+  max-height: 600px !important;
   aspect-ratio: 1.15;
   background: #333333;
   position: relative;
+  //border: thin solid rgba(255, 255, 255, 0.12);
+  box-shadow: rgba(100, 100, 111, 0.15) 0px 7px 29px 0px;
   & .play {
     position: relative;
     width: 100%;
@@ -394,10 +396,14 @@ export default {
     & img {
       width: 50px;
       height: 50px;
-      transition: transform 0.2s ease-in;
+      filter: hue-rotate(262deg);
       &:hover {
         cursor: pointer;
-        transform: scale(1.5);
+        animation-name: playAnim;
+        animation-duration: 0.2s;
+        animation-timing-function: ease-in;
+        animation-fill-mode: both;
+        animation-direction: alternate;
       }
     }
   }
@@ -406,17 +412,18 @@ export default {
     width: 100%;
   }
 }
-
+@keyframes playAnim {
+  @for $i from 0 through 100 {
+    #{$i * 5%} {
+      filter: hue-rotate(#{($i * -4deg) + 262deg});
+    }
+  }
+}
 #canvasWrapper {
   position: relative;
   height: 100% !important;
-  max-width: 700px !important;
 }
 
-.bg-color {
-  background: #333333 !important;
-  padding: 20px;
-}
 .v-progress-circular {
   position: absolute;
   display: flex;

@@ -12,8 +12,8 @@
       :continuous="true"
       :cycle="this.cycle"
       :show-arrows="true"
-      hide-delimiter-background
       delimiter-icon="mdi-minus"
+      hide-delimiter-background
       height="auto"
     >
       <v-carousel-item
@@ -140,18 +140,18 @@
             <v-col sm="12" md="6" lg="5" xl="5" class="col-align">
               <v-carousel
                 :continuous="true"
-                :cycle="this.cycle"
-                hide-delimiter-background
+                :show-arrows="false"
                 delimiter-icon="mdi-minus"
-                height="300"
-                width="400"
+                max-height="500"
+                width="100%"
                 class="d-flex justify-center"
               >
                 <v-carousel-item
+                  width="100%"
                   v-for="(item, i) in this.modelData.thumbnailLinks"
                   :key="i"
                 >
-                  <v-img :src="item" max-height="300" width="400"></v-img>
+                  <v-img :src="item" height="100%" width="100%" cover></v-img>
                 </v-carousel-item>
               </v-carousel>
               <v-simple-table class="mt-10 bg-color" id="data-table">
@@ -368,8 +368,7 @@ export default {
 }
 
 .bg-color {
-  padding: 20px;
-  background: #333333;
+  width: 100%;
 }
 
 .v-overlay--active {
@@ -381,4 +380,5 @@ export default {
   justify-content: center;
   flex-direction: column;
 }
+
 </style>
