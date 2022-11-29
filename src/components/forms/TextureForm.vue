@@ -72,7 +72,11 @@
         required
       ></v-select>
       <div class="text-center">
-        <v-btn color="rgb(104 250 220 / 65%)" class="white--text my-5" type="submit">
+        <v-btn
+          color="rgb(104 250 220 / 65%)"
+          class="white--text my-5"
+          type="submit"
+        >
           Submit
         </v-btn>
 
@@ -81,7 +85,12 @@
             {{ text }}
 
             <template v-slot:action="{ attrs }">
-              <v-btn color="pink" text v-bind="attrs" @click="snackbar = false">
+              <v-btn
+                color="#94d2bd"
+                text
+                v-bind="attrs"
+                @click="snackbar = false"
+              >
                 Close
               </v-btn>
             </template>

@@ -141,6 +141,9 @@ export default {
 #register-form {
   border-radius: 4px 4px 0 0;
 }
+#container {
+  margin-top: 100px !important;
+}
 @media screen and (min-width: 600px) {
   #container {
     width: 60%;

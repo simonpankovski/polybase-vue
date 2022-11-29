@@ -1,13 +1,5 @@
 <template>
-  <v-card :loading="loading" max-width="400" dark>
-    <template slot="progress">
-      <v-progress-linear
-        color="deep-purple"
-        height="10"
-        indeterminate
-      ></v-progress-linear>
-    </template>
-
+  <v-card max-width="400" dark>
     <v-carousel
       :continuous="true"
       :cycle="this.cycle"
@@ -92,6 +84,14 @@
       </v-btn>
       <v-overlay :z-index="zIndex" :value="overlay">
         <v-card elevation="2" class="overlay">
+          <v-progress-linear
+            id="progress-bar"
+            color="#94d2bd"
+            indeterminate
+            height="6"
+            bottom
+            v-if="loading"
+          ></v-progress-linear>
           <div
             class="d-flex justify-space-between px-3"
             style="padding-top: 10px"
@@ -101,7 +101,7 @@
 
               <template v-slot:action="{ attrs }">
                 <v-btn
-                  color="pink"
+                  color="#94d2bd"
                   text
                   v-bind="attrs"
                   @click="snackbar = false"
@@ -184,7 +184,7 @@
                       <td v-for="tag in modelData.tags" :key="tag">
                         <v-chip
                           class="ma-2"
-                          color="pink"
+                          color="#94d2bd"
                           label
                           text-color="white"
                         >
@@ -254,7 +254,7 @@ export default {
     downloadModel: function () {
       let type = this.isModel ? "model" : "texture";
       let jwt = "Bearer " + this.getToken();
-
+      this.loading = true;
       fetch(
         process.env.VUE_APP_BACKEND_SERVICE_URL +
           type +
@@ -274,11 +274,13 @@ export default {
         .then((blob) => {
           var file = window.URL.createObjectURL(blob);
           window.location.assign(file);
+          this.loading = false;
         });
     },
     addToCart: function () {
       let token = "Bearer " + this.getToken();
       let model = this.isModel ? "model" : "texture";
+      this.loading = true;
       fetch(
         process.env.VUE_APP_BACKEND_SERVICE_URL +
           "cart/" +
@@ -298,6 +300,7 @@ export default {
         .then((data) => {
           this.text = data.message;
           this.snackbar = true;
+          this.loading = false;
           if (data.code == 200) {
             this.$store.commit("incrementCart");
           }
@@ -380,5 +383,4 @@ export default {
   justify-content: center;
   flex-direction: column;
 }
-
 </style>

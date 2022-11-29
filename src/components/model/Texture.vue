@@ -31,7 +31,7 @@ export default {
       loading: false,
       shouldLoad: true,
       loadingComplete: false,
-      logo: require("@/assets/lilienstein_4k.hdr"),
+      hdr: require("@/assets/lilienstein_4k.hdr"),
       camera: null,
       scene: null,
       renderer: null,
@@ -141,9 +141,6 @@ export default {
         20
       );
       this.camera.position.z = 12;
-      // const light = new Three.DirectionalLight(0xffffff, 3);
-
-      // light.position.set(10, 10, 15);
       this.scene = new Three.Scene();
       this.scene.background = new Three.Color(0x1e1e1e);
       this.gui = new GUI({
@@ -168,7 +165,7 @@ export default {
       self.renderer.setPixelRatio(window.devicePixelRatio);
       self.renderer.physicallyCorrectLights = true;
       //let envmapLoader = new Three.PMREMGenerator(self.renderer);
-      new RGBELoader().load(this.logo, function (hdrMap) {
+      new RGBELoader().load(this.hdr, function (hdrMap) {
         hdrMap.mapping = Three.EquirectangularReflectionMapping;
         let envMapPMREM = new Three.PMREMGenerator(
           self.renderer
@@ -322,10 +319,8 @@ export default {
 
 #canvasWrapper {
   position: relative;
- 
 }
 .bg-color {
-
   background: #333333;
 }
 </style>

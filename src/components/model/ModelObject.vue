@@ -171,11 +171,6 @@ export default {
       this.camera.position.z = 0;
       this.camera.position.x = 10;
       this.camera.position.y = 40;
-      // const light = new Three.DirectionalLight(
-      //   0xffffff,
-      //   this.params.lightIntensity
-      // );
-      // light.position.set(10, 10, 150);
       this.scene = new Three.Scene();
       this.scene.background = new Three.Color(0x1e1e1e);
       let self = this;

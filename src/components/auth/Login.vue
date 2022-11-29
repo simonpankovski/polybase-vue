@@ -1,5 +1,5 @@
 <template>
-  <v-container class="mt-16" id="container">
+  <v-container id="container">
     <v-card color="grey darken-4" class="pa-8" id="login-form">
       <h1 class="white--text">LOGIN</h1>
       <form @submit.prevent="login">
@@ -128,6 +128,9 @@ export default {
 }
 #progress-bar {
   border-radius: 0 0 4px 4px;
+}
+#container {
+  margin-top: 100px !important;
 }
 @media screen and (min-width: 600px) {
   #container {
